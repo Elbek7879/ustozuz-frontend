@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { ArrowLeft, Mail, KeyRound } from "lucide-react";
 import Header from "@/components/Header";
 import { forgotPasswordRequest } from "@/lib/api";
@@ -16,9 +17,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     try {
       await forgotPasswordRequest(email);
+      setSent(true);
+    } catch {
+      toast.error("Server bilan bog'lanib bo'lmadi. Qayta urinib ko'ring");
     } finally {
       setLoading(false);
-      setSent(true);
     }
   }
 

@@ -35,12 +35,6 @@ const columns = [
   },
 ];
 
-const devLinks = [
-  { title: "Ustoz paneli", href: "/ustoz/panel" },
-  { title: "Talaba paneli", href: "/talaba/kurslarim" },
-  { title: "Admin panel", href: "/admin" },
-];
-
 export default function Footer() {
   return (
     <footer className="bg-gray-900">
@@ -79,21 +73,6 @@ export default function Footer() {
               Foydalanish shartlari
             </Link>
           </div>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-800 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap gap-4 items-center">
-          <span className="text-xs text-gray-500">🛠 Dasturchi uchun:</span>
-          {devLinks.map((link) => (
-            <Link
-              key={link.title}
-              href={link.href}
-              className="text-xs text-gray-400 hover:text-white"
-            >
-              {link.title}
-            </Link>
-          ))}
         </div>
       </div>
     </footer>

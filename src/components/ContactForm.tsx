@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { ApiError, sendContactMessage } from "@/lib/api";
 
 export default function ContactForm() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -12,11 +14,18 @@ export default function ContactForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Aloqa xabari:", form);
-    toast.success("Xabaringiz qabul qilindi");
-    setForm({ name: "", email: "", message: "" });
+    setSending(true);
+    try {
+      await sendContactMessage(form);
+      toast.success("Xabaringiz qabul qilindi. Tez orada javob beramiz");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Xabarni yuborib bo'lmadi");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -65,15 +74,11 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        className="w-full bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800"
+        disabled={sending}
+        className="w-full bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800 disabled:opacity-60"
       >
-        Yuborish
+        {sending ? "Yuborilmoqda..." : "Yuborish"}
       </button>
-
-      <p className="text-xs text-gray-400 text-center">
-        Namunaviy forma: xabar haqiqatan yuborilishi backend ulangandan keyin
-        ishlaydi.
-      </p>
     </form>
   );
 }

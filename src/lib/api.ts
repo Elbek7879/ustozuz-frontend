@@ -5,6 +5,7 @@ export type ApiCategory = {
   title: string;
   description: string;
   icon: string;
+  coursesCount: number;
 };
 
 export type ApiCourseCard = {
@@ -413,4 +414,32 @@ export function setAdminCourseStatus(token: string, courseId: number, status: Co
 
 export function deleteAdminCourse(token: string, courseId: number) {
   return apiFetch<void>(`/admin/courses/${courseId}`, { method: "DELETE", token });
+}
+
+// --- Profil ---
+
+export function updateProfile(token: string, data: { name: string; phone: string }) {
+  return apiFetch<ApiUser>("/me", { method: "PUT", body: data, token });
+}
+
+export function changePassword(token: string, data: { currentPassword: string; newPassword: string }) {
+  return apiFetch<void>("/me/password", { method: "PUT", body: data, token });
+}
+
+// --- Aloqa ---
+
+export type ApiContactMessage = {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+};
+
+export function sendContactMessage(data: { name: string; email: string; message: string }) {
+  return apiFetch<void>("/contact", { method: "POST", body: data });
+}
+
+export function getContactMessages(token: string) {
+  return apiFetch<ApiContactMessage[]>("/admin/messages", { token });
 }

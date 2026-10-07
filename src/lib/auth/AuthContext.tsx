@@ -16,6 +16,8 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  // Profil o'zgarganda header va boshqa joylar yangi ma'lumotni ko'rsin
+  updateUser: (user: ApiUser) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -70,7 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, login, register, logout, updateUser: setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

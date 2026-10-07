@@ -2,15 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingCart, Menu, X, Search, User, LogOut, BookOpen } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function Header() {
   const { items } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    setMenuOpen(false);
+    router.push(`/kurslar?qidiruv=${encodeURIComponent(q)}`);
+  }
 
   function dashboardLink() {
     if (user?.role === "ADMIN") return "/admin";
@@ -25,16 +36,19 @@ export default function Header() {
           Ustoz<span className="text-gray-900">Uz</span>
         </Link>
 
-        <div className="hidden md:flex flex-1 max-w-xl">
+        <form onSubmit={handleSearch} role="search" className="hidden md:flex flex-1 max-w-xl">
           <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              type="text"
-              placeholder="Istalgan narsani qidiring"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Kurs, ustoz yoki kategoriya qidiring"
+              aria-label="Qidiruv"
               className="w-full border border-gray-300 rounded-full py-2 pl-10 pr-5 text-sm focus:outline-none focus:border-indigo-500"
             />
           </div>
-        </div>
+        </form>
 
         <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-700 shrink-0">
           <Link href="/kategoriyalar" className="hover:text-indigo-700">
@@ -46,7 +60,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/savat" className="relative p-2 hover:text-indigo-700">
+          <Link href="/savat" aria-label="Savat" className="relative p-2 hover:text-indigo-700">
             <ShoppingCart className="w-5 h-5" />
             {items.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-indigo-700 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -55,10 +69,14 @@ export default function Header() {
             )}
           </Link>
 
-          {user ? (
+          {loading ? (
+            // Sessiya tekshirilayotganda "Tizimga kirish" bir lahza ko'rinib qolmasin
+            <div className="w-8 h-8" aria-hidden />
+          ) : user ? (
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen((v) => !v)}
+                aria-label="Foydalanuvchi menyusi"
                 className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100"
               >
                 <div className="w-8 h-8 rounded-full bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center">
@@ -131,11 +149,16 @@ export default function Header() {
 
       {menuOpen && (
         <div className="lg:hidden border-t border-gray-200 px-6 py-4 space-y-4">
-          <input
-            type="text"
-            placeholder="Istalgan narsani qidiring"
-            className="w-full border border-gray-300 rounded-full py-2 px-5 text-sm focus:outline-none focus:border-indigo-500"
-          />
+          <form onSubmit={handleSearch} role="search">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Kurs, ustoz yoki kategoriya qidiring"
+              aria-label="Qidiruv"
+              className="w-full border border-gray-300 rounded-full py-2 px-5 text-sm focus:outline-none focus:border-indigo-500"
+            />
+          </form>
 
           <nav className="flex flex-col gap-3 text-sm font-medium text-gray-700">
             <Link href="/kategoriyalar" onClick={() => setMenuOpen(false)}>

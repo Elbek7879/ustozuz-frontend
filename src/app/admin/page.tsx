@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { Users, BookOpen, Wallet, Star, ArrowRight, UserPlus, BookPlus } from "lucide-react";
+import { Users, BookOpen, Wallet, Star, ArrowRight, UserPlus, BookPlus, Mail } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { getAdminStats, type ApiActivityItem, type ApiAdminStats } from "@/lib/api";
+import {
+  getAdminStats,
+  getContactMessages,
+  type ApiActivityItem,
+  type ApiAdminStats,
+  type ApiContactMessage,
+} from "@/lib/api";
 import { formatPrice, timeAgo } from "@/lib/format";
 
 const quickLinks = [
@@ -25,12 +31,16 @@ const activityStyle: Record<ApiActivityItem["type"], { icon: typeof UserPlus; co
 function AdminDashboard() {
   const { token } = useAuth();
   const [stats, setStats] = useState<ApiAdminStats | null>(null);
+  const [messages, setMessages] = useState<ApiContactMessage[]>([]);
 
   useEffect(() => {
     if (!token) return;
     getAdminStats(token)
       .then(setStats)
       .catch(() => toast.error("Statistikani yuklab bo'lmadi"));
+    getContactMessages(token)
+      .then(setMessages)
+      .catch(() => {});
   }, [token]);
 
   const cards = stats
@@ -115,6 +125,31 @@ function AdminDashboard() {
               </Link>
             ))}
           </div>
+
+          <h2 className="text-lg font-semibold text-gray-900 mt-10 mb-4 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-gray-400" />
+            Aloqa xabarlari ({messages.length})
+          </h2>
+          {messages.length === 0 ? (
+            <p className="text-sm text-gray-400">Hozircha xabarlar yo&apos;q</p>
+          ) : (
+            <div className="border border-gray-200 rounded-xl divide-y divide-gray-100">
+              {messages.map((m) => (
+                <div key={m.id} className="p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-sm font-medium text-gray-900">
+                      {m.name}{" "}
+                      <a href={`mailto:${m.email}`} className="text-indigo-700 font-normal hover:underline">
+                        {m.email}
+                      </a>
+                    </p>
+                    <span className="text-xs text-gray-400">{timeAgo(m.createdAt)}</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">{m.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
