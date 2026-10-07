@@ -1,39 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { ArrowLeft, Trash2, EyeOff, Eye, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { courses as initialCourses } from "@/lib/courses";
-import { ArrowLeft, Trash2, EyeOff } from "lucide-react";
+import RequireRole from "@/components/RequireRole";
+import { useAuth } from "@/lib/auth/AuthContext";
+import {
+  ApiError,
+  deleteAdminCourse,
+  getAdminCourses,
+  setAdminCourseStatus,
+  type ApiAdminCourse,
+  type CourseStatus,
+} from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
-export default function AdminCoursesPage() {
-  const [courses, setCourses] = useState(initialCourses);
+const statusLabel: Record<CourseStatus, { text: string; className: string }> = {
+  ACTIVE: { text: "Faol", className: "bg-emerald-50 text-emerald-700" },
+  DRAFT: { text: "Qoralama", className: "bg-amber-50 text-amber-700" },
+  HIDDEN: { text: "Yashirin", className: "bg-gray-100 text-gray-600" },
+};
 
-  function handleDelete(title: string) {
-    if (confirm("Bu kursni o'chirmoqchimisiz?")) {
-      setCourses((prev) => prev.filter((c) => c.title !== title));
+function CoursesTable() {
+  const { token } = useAuth();
+  const [courses, setCourses] = useState<ApiAdminCourse[] | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+    getAdminCourses(token)
+      .then(setCourses)
+      .catch(() => toast.error("Kurslarni yuklab bo'lmadi"));
+  }, [token]);
+
+  async function changeStatus(c: ApiAdminCourse, status: CourseStatus) {
+    if (!token) return;
+    setBusyId(c.id);
+    try {
+      await setAdminCourseStatus(token, c.id, status);
+      setCourses((prev) => prev?.map((x) => (x.id === c.id ? { ...x, status } : x)) ?? null);
+      toast.success(status === "HIDDEN" ? "Kurs yashirildi" : "Kurs faollashtirildi");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Xatolik yuz berdi");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleDelete(c: ApiAdminCourse) {
+    if (!token) return;
+    if (!confirm(`"${c.title}" kursini o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.`)) return;
+    setBusyId(c.id);
+    try {
+      await deleteAdminCourse(token, c.id);
+      setCourses((prev) => prev?.filter((x) => x.id !== c.id) ?? null);
+      toast.success("Kurs o'chirildi");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Xatolik yuz berdi");
+    } finally {
+      setBusyId(null);
     }
   }
 
   return (
-    <main>
-      <Header />
+    <section className="max-w-7xl mx-auto px-6 py-10">
+      <Link
+        href="/admin"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-700 mb-4"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Admin panel
+      </Link>
 
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-700 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Admin panel
-        </Link>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Barcha kurslar</h1>
+        <span className="text-sm text-gray-500">{courses?.length ?? 0} ta natija</span>
+      </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Barcha kurslar</h1>
-          <span className="text-sm text-gray-500">{courses.length} ta natija</span>
-        </div>
-
+      {courses === null ? (
+        <p className="text-gray-400">Yuklanmoqda...</p>
+      ) : (
         <div className="border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-500">
@@ -42,61 +91,92 @@ export default function AdminCoursesPage() {
                 <th className="px-5 py-3 font-medium">Ustoz</th>
                 <th className="px-5 py-3 font-medium">Kategoriya</th>
                 <th className="px-5 py-3 font-medium">Talabalar</th>
-                <th className="px-5 py-3 font-medium">Reyting</th>
                 <th className="px-5 py-3 font-medium">Narx</th>
+                <th className="px-5 py-3 font-medium">Holat</th>
                 <th className="px-5 py-3 font-medium text-right">Amallar</th>
               </tr>
             </thead>
             <tbody>
-              {courses.map((c) => (
-                <tr key={c.title} className="border-t border-gray-100">
-                  <td className="px-5 py-3 font-medium text-gray-900 max-w-xs">
-                    {c.title}
-                  </td>
-                  <td className="px-5 py-3 text-gray-500">{c.instructor}</td>
-                  <td className="px-5 py-3">
-                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">
-                      {c.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-gray-500">{c.students}</td>
-                  <td className="px-5 py-3 text-amber-600 font-medium">
-                    {c.rating} ⭐
-                  </td>
-                  <td className="px-5 py-3 font-semibold text-gray-900">
-                    {c.price}
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        title="Yashirish"
-                        className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded"
-                      >
-                        <EyeOff className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.title)}
-                        title="O'chirish"
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {courses.map((c) => {
+                const status = statusLabel[c.status];
+                const busy = busyId === c.id;
+                return (
+                  <tr key={c.id} className="border-t border-gray-100">
+                    <td className="px-5 py-3 font-medium text-gray-900 max-w-xs">{c.title}</td>
+                    <td className="px-5 py-3 text-gray-500">{c.instructorName}</td>
+                    <td className="px-5 py-3">
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">
+                        {c.category}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-gray-500">{c.studentsCount}</td>
+                    <td className="px-5 py-3 font-semibold text-gray-900 whitespace-nowrap">
+                      {formatPrice(c.price)}
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${status.className}`}>
+                        {status.text}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        {c.status === "ACTIVE" && (
+                          <Link
+                            href={`/kurslar/${c.slug}`}
+                            title="Ko'rish"
+                            className="p-1.5 text-gray-400 hover:text-indigo-700 hover:bg-indigo-50 rounded"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Link>
+                        )}
+                        {c.status === "ACTIVE" ? (
+                          <button
+                            onClick={() => changeStatus(c, "HIDDEN")}
+                            disabled={busy}
+                            title="Yashirish"
+                            className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded disabled:opacity-40"
+                          >
+                            <EyeOff className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => changeStatus(c, "ACTIVE")}
+                            disabled={busy}
+                            title="Faollashtirish"
+                            className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded disabled:opacity-40"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(c)}
+                          disabled={busy}
+                          title="O'chirish"
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded disabled:opacity-40"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
+      )}
+    </section>
+  );
+}
 
-        <p className="text-xs text-gray-400 mt-4">
-          Eslatma: bu o&apos;zgarishlar hozircha faqat shu sahifada
-          ko&apos;rinadi, backend ulanmagani uchun sahifani yangilasangiz
-          qayta tiklanadi.
-        </p>
-      </section>
-
-      <Footer />
-    </main>
+export default function AdminCoursesPage() {
+  return (
+    <RequireRole role="ADMIN">
+      <main>
+        <Header />
+        <CoursesTable />
+        <Footer />
+      </main>
+    </RequireRole>
   );
 }

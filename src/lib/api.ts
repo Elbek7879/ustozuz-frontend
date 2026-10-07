@@ -330,3 +330,87 @@ export function setLessonCompleted(token: string, slug: string, lessonId: number
 export function getMyCertificates(token: string) {
   return apiFetch<ApiCertificate[]>("/me/certificates", { token });
 }
+
+// --- Admin ---
+
+export type ApiActivityItem = {
+  type: "USER" | "COURSE" | "ORDER";
+  text: string;
+  createdAt: string;
+};
+
+export type ApiAdminStats = {
+  totalUsers: number;
+  totalStudents: number;
+  totalInstructors: number;
+  totalCourses: number;
+  activeCourses: number;
+  draftCourses: number;
+  paidOrders: number;
+  totalRevenue: number;
+  avgRating: number;
+  recentActivity: ApiActivityItem[];
+};
+
+export type ApiAdminUser = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: ApiUser["role"];
+  status: "ACTIVE" | "BLOCKED";
+  createdAt: string;
+};
+
+export type ApiAdminCourse = {
+  id: number;
+  title: string;
+  slug: string;
+  instructorName: string;
+  category: string;
+  price: number;
+  status: CourseStatus;
+  rating: number;
+  studentsCount: number;
+  createdAt: string;
+};
+
+export function getAdminStats(token: string) {
+  return apiFetch<ApiAdminStats>("/admin/stats", { token });
+}
+
+export function getAdminUsers(token: string) {
+  return apiFetch<ApiAdminUser[]>("/admin/users", { token });
+}
+
+export function setUserStatus(token: string, userId: number, status: ApiAdminUser["status"]) {
+  return apiFetch<ApiAdminUser>(`/admin/users/${userId}/status`, {
+    method: "PUT",
+    body: { status },
+    token,
+  });
+}
+
+export function setUserRole(token: string, userId: number, role: ApiUser["role"]) {
+  return apiFetch<ApiAdminUser>(`/admin/users/${userId}/role`, {
+    method: "PUT",
+    body: { role },
+    token,
+  });
+}
+
+export function getAdminCourses(token: string) {
+  return apiFetch<ApiAdminCourse[]>("/admin/courses", { token });
+}
+
+export function setAdminCourseStatus(token: string, courseId: number, status: CourseStatus) {
+  return apiFetch<void>(`/admin/courses/${courseId}/status`, {
+    method: "PUT",
+    body: { status },
+    token,
+  });
+}
+
+export function deleteAdminCourse(token: string, courseId: number) {
+  return apiFetch<void>(`/admin/courses/${courseId}`, { method: "DELETE", token });
+}
