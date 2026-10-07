@@ -109,7 +109,7 @@ function InstructorPanelContent() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <p className="font-semibold text-gray-900 text-sm">
+                    <p className="font-semibold text-gray-900 text-sm whitespace-nowrap">
                       {formatPrice(course.price)}
                     </p>
                     <span

@@ -101,7 +101,8 @@ export default async function CourseDetailPage({
           </div>
         </div>
 
-        <div className="border border-gray-200 rounded-xl p-6 h-fit sticky top-20">
+        {/* Telefonda xarid bloki birinchi chiqadi, kompyuterda o'ng tomonda yopishib turadi */}
+        <div className="order-first md:order-none border border-gray-200 rounded-xl p-6 h-fit md:sticky md:top-20">
           <p className="text-2xl font-bold text-gray-900">
             {formatPrice(course.price)}
           </p>

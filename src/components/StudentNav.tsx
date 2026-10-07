@@ -15,7 +15,7 @@ export default function StudentNav() {
 
   return (
     <nav className="border-b border-gray-200 bg-white">
-      <div className="max-w-7xl mx-auto px-6 flex gap-6 overflow-x-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-5 sm:gap-6 overflow-x-auto [scrollbar-width:none]">
         {tabs.map((t) => {
           const Icon = t.icon;
           const active = pathname === t.href;
@@ -29,7 +29,7 @@ export default function StudentNav() {
                   : "border-transparent text-gray-500 hover:text-gray-800"
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4 h-4 hidden sm:block" />
               {t.label}
             </Link>
           );
