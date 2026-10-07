@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { getMyCourses, type ApiInstructorCourse } from "@/lib/api";
+import { getInstructorCourses, type ApiInstructorCourse } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
 import { Plus, Eye, Pencil } from "lucide-react";
 
@@ -23,7 +23,7 @@ function InstructorPanelContent() {
 
   useEffect(() => {
     if (!token) return;
-    getMyCourses(token)
+    getInstructorCourses(token)
       .then(setCourses)
       .catch(() => toast.error("Kurslarni yuklab bo'lmadi"));
   }, [token]);

@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/lib/cart/CartContext";
+import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
   const { items, removeItem, total } = useCart();
@@ -31,7 +32,7 @@ export default function CartPage() {
             <div className="md:col-span-2 space-y-4">
               {items.map((course) => (
                 <div
-                  key={course.title}
+                  key={course.id}
                   className="flex items-center gap-4 border border-gray-200 rounded-lg p-4"
                 >
                   <div className="flex-1">
@@ -42,11 +43,11 @@ export default function CartPage() {
                       {course.instructor}
                     </p>
                     <p className="font-bold text-gray-900 mt-2">
-                      {course.price}
+                      {formatPrice(course.price)}
                     </p>
                   </div>
                   <button
-                    onClick={() => removeItem(course.title)}
+                    onClick={() => removeItem(course.id)}
                     aria-label="O'chirish"
                     className="p-2 text-gray-400 hover:text-red-600"
                   >
@@ -66,7 +67,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between font-bold text-gray-900 text-base border-t border-gray-200 pt-3 mt-3">
                 <span>Jami</span>
-                <span>{total.toLocaleString("uz-UZ")} so&apos;m</span>
+                <span>{formatPrice(total)}</span>
               </div>
               <Link
                 href="/tolov"

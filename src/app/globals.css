@@ -66,3 +66,22 @@ body {
     animation: none;
   }
 }
+/* Sertifikatni chop etishda faqat sertifikatning o'zi chiqadi */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    height: fit-content;
+    max-width: 640px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

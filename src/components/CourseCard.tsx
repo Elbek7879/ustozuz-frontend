@@ -2,29 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Check } from "lucide-react";
 import { categories } from "@/lib/categories";
-import { useCart } from "@/lib/cart/CartContext";
 import { formatPrice } from "@/lib/format";
 import { coverOf } from "@/lib/images";
 import type { ApiCourseCard } from "@/lib/api";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default function CourseCard({ course }: { course: ApiCourseCard }) {
   const cat = categories.find((c) => c.title === course.category);
-  const { addItem, isInCart } = useCart();
-  const inCart = isInCart(course.title);
-
-  function handleAdd() {
-    addItem({
-      title: course.title,
-      instructor: course.instructorName,
-      category: course.category,
-      rating: course.rating,
-      students: course.studentsCount,
-      price: formatPrice(course.price),
-      image: course.imageUrl,
-    });
-  }
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all bg-white">
@@ -58,25 +43,7 @@ export default function CourseCard({ course }: { course: ApiCourseCard }) {
       </Link>
 
       <div className="p-4 pt-3">
-        <button
-          onClick={handleAdd}
-          disabled={inCart}
-          className={`w-full flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-md transition ${
-            inCart
-              ? "bg-emerald-50 text-emerald-700 cursor-default"
-              : "border border-indigo-700 text-indigo-700 hover:bg-indigo-50"
-          }`}
-        >
-          {inCart ? (
-            <>
-              <Check className="w-4 h-4" /> Savatda
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="w-4 h-4" /> Savatga qo&apos;shish
-            </>
-          )}
-        </button>
+        <AddToCartButton course={course} variant="card" />
       </div>
     </div>
   );

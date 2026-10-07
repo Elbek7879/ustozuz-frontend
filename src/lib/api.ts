@@ -173,7 +173,7 @@ export type ApiLesson = {
   videoUrl: string | null;
 };
 
-export function getMyCourses(token: string) {
+export function getInstructorCourses(token: string) {
   return apiFetch<ApiInstructorCourse[]>("/instructor/courses", { token });
 }
 
@@ -242,4 +242,91 @@ export function reorderLessons(token: string, courseId: number, lessonIds: numbe
     body: { lessonIds },
     token,
   });
+}
+// --- Sotib olish ---
+
+export type PaymentMethod = "PAYME" | "CLICK" | "CARD";
+
+export type ApiOrder = {
+  id: number;
+  status: "PENDING" | "PAID" | "CANCELLED";
+  method: PaymentMethod;
+  totalAmount: number;
+  createdAt: string;
+  items: { courseId: number; slug: string; title: string; price: number }[];
+};
+
+export function checkout(
+  token: string,
+  data: { courseIds: number[]; buyerName: string; buyerPhone: string; method: PaymentMethod }
+) {
+  return apiFetch<ApiOrder>("/orders/checkout", { method: "POST", body: data, token });
+}
+
+// --- Talabaning kurslari ---
+
+export type ApiEnrolledCourse = {
+  courseId: number;
+  slug: string;
+  title: string;
+  instructorName: string;
+  category: string;
+  imageUrl: string;
+  progress: number;
+  lessonsCount: number;
+  completedLessons: number;
+  enrolledAt: string;
+  completedAt: string | null;
+};
+
+export type ApiEnrolledLesson = {
+  id: number;
+  title: string;
+  orderIndex: number;
+  videoUrl: string | null;
+  completed: boolean;
+};
+
+export type ApiEnrolledCourseDetail = {
+  courseId: number;
+  slug: string;
+  title: string;
+  description: string;
+  instructorName: string;
+  category: string;
+  imageUrl: string;
+  progress: number;
+  completedAt: string | null;
+  certificateId: number | null;
+  lessons: ApiEnrolledLesson[];
+};
+
+export type ApiCertificate = {
+  id: number;
+  number: string;
+  studentName: string;
+  courseTitle: string;
+  courseSlug: string;
+  instructorName: string;
+  issuedAt: string;
+};
+
+export function getEnrolledCourses(token: string) {
+  return apiFetch<ApiEnrolledCourse[]>("/me/courses", { token });
+}
+
+export function getEnrolledCourse(token: string, slug: string) {
+  return apiFetch<ApiEnrolledCourseDetail>(`/me/courses/${slug}`, { token });
+}
+
+export function setLessonCompleted(token: string, slug: string, lessonId: number, completed: boolean) {
+  return apiFetch<ApiEnrolledCourseDetail>(`/me/courses/${slug}/lessons/${lessonId}`, {
+    method: "PUT",
+    body: { completed },
+    token,
+  });
+}
+
+export function getMyCertificates(token: string) {
+  return apiFetch<ApiCertificate[]>("/me/certificates", { token });
 }

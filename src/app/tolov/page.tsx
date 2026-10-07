@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -8,31 +8,78 @@ import { CreditCard, Smartphone, Lock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useCart } from "@/lib/cart/CartContext";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useEnrolled } from "@/lib/enrollments/EnrolledContext";
+import { checkout, ApiError, type PaymentMethod } from "@/lib/api";
+import { formatPrice } from "@/lib/format";
 
-const methods = [
-  { id: "payme", title: "Payme", desc: "Payme ilovasi orqali to'lash", icon: Smartphone },
-  { id: "click", title: "Click", desc: "Click ilovasi orqali to'lash", icon: Smartphone },
-  { id: "card", title: "Uzcard / Humo", desc: "Bank kartasi orqali to'lash", icon: CreditCard },
+const methods: { id: PaymentMethod; title: string; desc: string; icon: typeof Smartphone }[] = [
+  { id: "PAYME", title: "Payme", desc: "Payme ilovasi orqali to'lash", icon: Smartphone },
+  { id: "CLICK", title: "Click", desc: "Click ilovasi orqali to'lash", icon: Smartphone },
+  { id: "CARD", title: "Uzcard / Humo", desc: "Bank kartasi orqali to'lash", icon: CreditCard },
 ];
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user, token, loading } = useAuth();
   const { items, total, clearCart } = useCart();
-  const [method, setMethod] = useState("payme");
+  const { refresh } = useEnrolled();
+  const [method, setMethod] = useState<PaymentMethod>("PAYME");
   const [paid, setPaid] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "" });
+
+  // To'lov uchun tizimga kirish shart
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/kirish?next=/tolov");
+    }
+  }, [loading, user, router]);
+
+  // Ism va telefonni profildan oldindan to'ldiramiz
+  useEffect(() => {
+    if (user) {
+      setForm((f) => ({
+        name: f.name || user.name,
+        phone: f.phone || user.phone || "",
+      }));
+    }
+  }, [user]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Buyurtma:", { ...form, method, items });
-    setPaid(true);
-    clearCart();
-    toast.success("To'lov qabul qilindi");
-    router.push("/tolov/muvaffaqiyat");
+    if (!token) return;
+
+    setSubmitting(true);
+    try {
+      await checkout(token, {
+        courseIds: items.map((c) => c.id),
+        buyerName: form.name,
+        buyerPhone: form.phone,
+        method,
+      });
+      setPaid(true);
+      clearCart();
+      await refresh();
+      toast.success("To'lov qabul qilindi");
+      router.push("/tolov/muvaffaqiyat");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "To'lovni amalga oshirib bo'lmadi");
+      setSubmitting(false);
+    }
+  }
+
+  if (loading || !user) {
+    return (
+      <main>
+        <Header />
+        <p className="max-w-xl mx-auto px-6 py-24 text-center text-gray-400">Yuklanmoqda...</p>
+      </main>
+    );
   }
 
   if (items.length === 0 && !paid) {
@@ -84,7 +131,6 @@ export default function CheckoutPage() {
                     value={form.name}
                     onChange={handleChange}
                     required
-                    placeholder="Elbek Abduraximov"
                     className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -175,10 +221,10 @@ export default function CheckoutPage() {
 
             <div className="space-y-3 pb-4 border-b border-gray-200">
               {items.map((c) => (
-                <div key={c.title} className="flex justify-between gap-3 text-sm">
+                <div key={c.id} className="flex justify-between gap-3 text-sm">
                   <span className="text-gray-700 line-clamp-2">{c.title}</span>
                   <span className="font-medium text-gray-900 shrink-0">
-                    {c.price}
+                    {formatPrice(c.price)}
                   </span>
                 </div>
               ))}
@@ -186,19 +232,20 @@ export default function CheckoutPage() {
 
             <div className="flex justify-between font-bold text-gray-900 text-base pt-4">
               <span>Jami</span>
-              <span>{total.toLocaleString("uz-UZ")} so&apos;m</span>
+              <span>{formatPrice(total)}</span>
             </div>
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 mt-5"
+              disabled={submitting}
+              className="w-full flex items-center justify-center gap-2 bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 mt-5 disabled:opacity-60"
             >
               <Lock className="w-4 h-4" />
-              To&apos;lash
+              {submitting ? "To'lanmoqda..." : "To'lash"}
             </button>
 
             <p className="text-xs text-gray-400 mt-3 text-center">
-              Bu namunaviy sahifa: hozircha haqiqiy to&apos;lov o&apos;tmaydi.
+              Sinov rejimi: haqiqiy pul yechilmaydi, kurslar darhol ochiladi.
             </p>
           </div>
         </form>

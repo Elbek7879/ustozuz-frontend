@@ -5,16 +5,20 @@ import { X, Award, Download } from "lucide-react";
 
 type Props = {
   onClose: () => void;
-  studentName?: string;
-  courseTitle?: string;
-  date?: string;
+  studentName: string;
+  courseTitle: string;
+  date: string;
+  number?: string;
+  sample?: boolean;
 };
 
 export default function CertificateModal({
   onClose,
-  studentName = "Sizning ismingiz",
-  courseTitle = "Frontend dasturlash: noldan mutaxassisgacha",
-  date = "25.09.2026",
+  studentName,
+  courseTitle,
+  date,
+  number,
+  sample = false,
 }: Props) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -43,7 +47,7 @@ export default function CertificateModal({
           <X className="w-6 h-6" />
         </button>
 
-        <div className="border-2 border-indigo-700 rounded-xl p-8 text-center bg-gradient-to-br from-indigo-50 to-white">
+        <div className="print-area border-2 border-indigo-700 rounded-xl p-8 text-center bg-gradient-to-br from-indigo-50 to-white">
           <div className="w-14 h-14 rounded-full bg-indigo-700 mx-auto flex items-center justify-center mb-4">
             <Award className="w-7 h-7 text-white" />
           </div>
@@ -73,25 +77,26 @@ export default function CertificateModal({
               <p className="text-sm font-medium text-gray-700">{date}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-400">Tasdiqlandi</p>
+              <p className="text-xs text-gray-400">{number ? `№ ${number}` : "Tasdiqlandi"}</p>
               <p className="text-sm font-medium text-gray-700">UstozUz.uz</p>
             </div>
           </div>
         </div>
 
-        <button
-          disabled
-          title="Yuklab olish backend ulangandan keyin ishlaydi"
-          className="mt-5 w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-400 font-medium py-2.5 rounded-md cursor-not-allowed"
-        >
-          <Download className="w-4 h-4" />
-          Yuklab olish (tez orada)
-        </button>
-
-        <p className="text-center text-xs text-gray-400 mt-3">
-          Bu — namunaviy ko&apos;rinish. Haqiqiy sertifikat kursni
-          tugatgandan so&apos;ng, sizning ismingiz bilan avtomatik yaratiladi.
-        </p>
+        {sample ? (
+          <p className="text-center text-xs text-gray-400 mt-5">
+            Bu — namunaviy ko&apos;rinish. Haqiqiy sertifikat kursni
+            tugatgandan so&apos;ng, sizning ismingiz bilan avtomatik yaratiladi.
+          </p>
+        ) : (
+          <button
+            onClick={() => window.print()}
+            className="print:hidden mt-5 w-full flex items-center justify-center gap-2 bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800"
+          >
+            <Download className="w-4 h-4" />
+            Chop etish / PDF saqlash
+          </button>
+        )}
       </div>
     </div>
   );

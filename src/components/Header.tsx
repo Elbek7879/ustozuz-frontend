@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Menu, X, Search, User, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, X, Search, User, LogOut, BookOpen } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -79,6 +79,16 @@ export default function Header() {
                     <User className="w-4 h-4" />
                     Mening kabinetim
                   </Link>
+                  {user.role !== "STUDENT" && (
+                    <Link
+                      href="/talaba/kurslarim"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      Sotib olgan kurslarim
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       logout();

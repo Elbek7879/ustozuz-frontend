@@ -2,32 +2,44 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import type { Course } from "@/lib/courses";
+import type { ApiCourseCard } from "@/lib/api";
+
+export type CartItem = {
+  id: number;
+  slug: string;
+  title: string;
+  instructor: string;
+  price: number;
+  image: string;
+};
 
 type CartContextType = {
-  items: Course[];
-  addItem: (course: Course) => void;
-  removeItem: (title: string) => void;
-  isInCart: (title: string) => boolean;
+  items: CartItem[];
+  addItem: (course: ApiCourseCard) => void;
+  removeItem: (id: number) => void;
+  isInCart: (id: number) => boolean;
   total: number;
   clearCart: () => void;
 };
 
+const STORAGE_KEY = "ustozuz_cart";
+
 const CartContext = createContext<CartContextType | null>(null);
 
-function parsePrice(price: string): number {
-  if (typeof price !== "string") return 0;
-  return Number(price.replace(/[^\d]/g, ""));
+// Eski versiyadagi savat elementlarida id yo'q edi — ularni tashlab yuboramiz
+function isValidItem(value: unknown): value is CartItem {
+  const item = value as CartItem;
+  return typeof item?.id === "number" && typeof item?.price === "number" && typeof item?.slug === "string";
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<Course[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("ustozuz_cart");
-      if (saved) setItems(JSON.parse(saved));
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+      setItems(Array.isArray(saved) ? saved.filter(isValidItem) : []);
     } catch {
       setItems([]);
     }
@@ -36,28 +48,38 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem("ustozuz_cart", JSON.stringify(items));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, hydrated]);
 
-  function addItem(course: Course) {
-    if (items.some((c) => c.title === course.title)) return;
-    setItems((prev) => [...prev, course]);
+  function addItem(course: ApiCourseCard) {
+    if (items.some((c) => c.id === course.id)) return;
+    setItems((prev) => [
+      ...prev,
+      {
+        id: course.id,
+        slug: course.slug,
+        title: course.title,
+        instructor: course.instructorName,
+        price: course.price,
+        image: course.imageUrl,
+      },
+    ]);
     toast.success(`"${course.title}" savatga qo'shildi`);
   }
 
-  function removeItem(title: string) {
-    setItems((prev) => prev.filter((c) => c.title !== title));
+  function removeItem(id: number) {
+    setItems((prev) => prev.filter((c) => c.id !== id));
   }
 
-  function isInCart(title: string) {
-    return items.some((c) => c.title === title);
+  function isInCart(id: number) {
+    return items.some((c) => c.id === id);
   }
 
   function clearCart() {
     setItems([]);
   }
 
-  const total = items.reduce((sum, c) => sum + parsePrice(c.price), 0);
+  const total = items.reduce((sum, c) => sum + c.price, 0);
 
   return (
     <CartContext.Provider

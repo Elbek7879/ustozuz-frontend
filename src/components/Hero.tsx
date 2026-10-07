@@ -112,7 +112,13 @@ export default function Hero() {
       </div>
 
       {showCertificate && (
-        <CertificateModal onClose={() => setShowCertificate(false)} />
+        <CertificateModal
+          onClose={() => setShowCertificate(false)}
+          studentName="Sizning ismingiz"
+          courseTitle="Frontend dasturlash: noldan mutaxassisgacha"
+          date="25.09.2026"
+          sample
+        />
       )}
     </section>
   );

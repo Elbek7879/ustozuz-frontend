@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { CartProvider } from "@/lib/cart/CartContext";
 import { AuthProvider } from "@/lib/auth/AuthContext";
+import { EnrolledProvider } from "@/lib/enrollments/EnrolledContext";
 
 export const metadata: Metadata = {
   title: "UstozUz — Onlayn ta'lim platformasi",
@@ -18,10 +19,12 @@ export default function RootLayout({
     <html lang="uz">
       <body>
         <AuthProvider>
-          <CartProvider>
-            {children}
-            <Toaster position="bottom-center" />
-          </CartProvider>
+          <EnrolledProvider>
+            <CartProvider>
+              {children}
+              <Toaster position="bottom-center" />
+            </CartProvider>
+          </EnrolledProvider>
         </AuthProvider>
       </body>
     </html>

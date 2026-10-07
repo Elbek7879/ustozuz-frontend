@@ -37,7 +37,7 @@ export default function PaymentSuccessPage() {
         </div>
 
         <p className="text-xs text-gray-400 mt-8">
-          Namunaviy sahifa: haqiqiy to&apos;lov backend ulangandan keyin ishlaydi.
+          Sinov rejimi: haqiqiy pul yechilmadi.
         </p>
       </section>
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import Header from "@/components/Header";
 import { useAuth, ApiError } from "@/lib/auth/AuthContext";
+import { nextPath } from "@/lib/auth/redirect";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function RegisterPage() {
     try {
       await register(form.name, form.email, form.password);
       toast.success("Ro'yxatdan muvaffaqiyatli o'tdingiz");
-      router.push("/");
+      router.push(nextPath());
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Xatolik yuz berdi";
       toast.error(message);
