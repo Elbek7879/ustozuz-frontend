@@ -3,17 +3,11 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Star, Users, Clock, Award, CheckCircle2 } from "lucide-react";
-import { getCourseBySlug, getCourses } from "@/lib/api";
+import { notFound } from "next/navigation";
+import { getCourseBySlug, getCourses, ApiError } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
+import { coverOf } from "@/lib/images";
 import AddToCartButton from "@/components/AddToCartButton";
-
-const sampleCurriculum = [
-  "Kursga kirish va asosiy tushunchalar",
-  "Amaliy mashg'ulot: birinchi loyiha",
-  "Chuqurlashtirilgan mavzular",
-  "Real loyihada qo'llash",
-  "Yakuniy loyiha va sertifikat",
-];
 
 export default async function CourseDetailPage({
   params,
@@ -21,7 +15,10 @@ export default async function CourseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const course = await getCourseBySlug(slug);
+  const course = await getCourseBySlug(slug).catch((err) => {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  });
 
   const allCourses = await getCourses({ category: course.category });
   const related = allCourses.items
@@ -63,7 +60,7 @@ export default async function CourseDetailPage({
 
           <div className="relative h-56 rounded-xl overflow-hidden self-start">
             <Image
-              src={course.imageUrl}
+              src={coverOf(course.imageUrl)}
               alt={course.title}
               fill
               sizes="380px"
@@ -79,9 +76,12 @@ export default async function CourseDetailPage({
             <h2 className="font-semibold text-gray-900 mb-4">
               Kurs dasturi
             </h2>
+            {course.lessons.length === 0 && (
+              <p className="text-sm text-gray-500">Darslar tez orada qo&apos;shiladi.</p>
+            )}
             <div className="space-y-3">
-              {sampleCurriculum.map((item, i) => (
-                <div key={item} className="flex items-center gap-3">
+              {course.lessons.map((item, i) => (
+                <div key={`${i}-${item}`} className="flex items-center gap-3">
                   <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
                     {i + 1}
                   </span>
@@ -143,7 +143,7 @@ export default async function CourseDetailPage({
               >
                 <div className="relative h-32">
                   <Image
-                    src={c.imageUrl}
+                    src={coverOf(c.imageUrl)}
                     alt={c.title}
                     fill
                     sizes="300px"

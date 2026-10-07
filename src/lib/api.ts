@@ -22,6 +22,7 @@ export type ApiCourseCard = {
 export type ApiCourseDetail = ApiCourseCard & {
   description: string;
   ratingCount: number;
+  lessons: string[];
 };
 
 export type ApiPage<T> = {
@@ -86,11 +87,9 @@ async function apiFetch<T>(
     throw new ApiError(res.status, message);
   }
 
-  if (res.status === 204) {
-    return undefined as T;
-  }
-
-  return res.json();
+  // void endpointlar 200 bilan bo'sh javob qaytaradi — bunda JSON o'qib bo'lmaydi
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
 // --- Ochiq ma'lumotlar ---
@@ -142,16 +141,29 @@ export function getMe(token: string) {
 
 // --- Ustoz paneli ---
 
+export type CourseStatus = "DRAFT" | "ACTIVE" | "HIDDEN";
+
 export type ApiInstructorCourse = {
   id: number;
   title: string;
   slug: string;
   category: string;
+  description: string;
   price: number;
-  status: "DRAFT" | "ACTIVE" | "HIDDEN";
+  imageUrl: string;
+  status: CourseStatus;
   rating: number;
   studentsCount: number;
+  lessonsCount: number;
   createdAt: string;
+};
+
+export type CourseFormData = {
+  title: string;
+  category: string;
+  description: string;
+  price: number;
+  imageUrl?: string;
 };
 
 export type ApiLesson = {
@@ -165,10 +177,11 @@ export function getMyCourses(token: string) {
   return apiFetch<ApiInstructorCourse[]>("/instructor/courses", { token });
 }
 
-export function createCourse(
-  token: string,
-  data: { title: string; category: string; description: string; price: number; imageUrl?: string }
-) {
+export function getInstructorCourse(token: string, courseId: number) {
+  return apiFetch<ApiInstructorCourse>(`/instructor/courses/${courseId}`, { token });
+}
+
+export function createCourse(token: string, data: CourseFormData) {
   return apiFetch<ApiInstructorCourse>("/instructor/courses", {
     method: "POST",
     body: data,
@@ -176,11 +189,7 @@ export function createCourse(
   });
 }
 
-export function updateCourse(
-  token: string,
-  courseId: number,
-  data: { title: string; category: string; description: string; price: number; imageUrl?: string }
-) {
+export function updateCourse(token: string, courseId: number, data: CourseFormData) {
   return apiFetch<ApiInstructorCourse>(`/instructor/courses/${courseId}`, {
     method: "PUT",
     body: data,

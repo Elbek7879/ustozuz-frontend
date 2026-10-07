@@ -1,101 +1,298 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { ArrowUp, ArrowDown, Plus, Trash2, Eye, Video } from "lucide-react";
+import { useAuth } from "@/lib/auth/AuthContext";
 import {
-  ArrowUp,
-  ArrowDown,
-  Plus,
-  Trash2,
-  Upload,
-  Video,
-} from "lucide-react";
-import { categories } from "@/lib/categories";
-import type { Course } from "@/lib/courses";
+  ApiError,
+  createLesson,
+  deleteCourse,
+  deleteLesson,
+  getCategories,
+  getCourseLessons,
+  getInstructorCourse,
+  reorderLessons,
+  updateCourse,
+  updateCourseStatus,
+  updateLesson,
+  type ApiCategory,
+  type ApiInstructorCourse,
+  type ApiLesson,
+  type CourseStatus,
+} from "@/lib/api";
+import { coverOf } from "@/lib/images";
 
-type Lesson = { id: number; title: string };
 type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-
-const initialLessons: Lesson[] = [
-  { id: 1, title: "Kursga kirish va asosiy tushunchalar" },
-  { id: 2, title: "Amaliy mashg'ulot: birinchi loyiha" },
-  { id: 3, title: "Chuqurlashtirilgan mavzular" },
-  { id: 4, title: "Real loyihada qo'llash" },
-  { id: 5, title: "Yakuniy loyiha va sertifikat" },
-];
 
 const inputClass =
   "w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500";
 
-const mockNotice =
-  "Namuna rejim: o'zgarishlar hali saqlanmaydi (backend ulanmagan)";
+const statusInfo: Record<CourseStatus, { text: string; hint: string; className: string }> = {
+  ACTIVE: {
+    text: "Faol",
+    hint: "Kurs katalogda ko'rinadi va sotib olinishi mumkin.",
+    className: "bg-emerald-50 text-emerald-700",
+  },
+  DRAFT: {
+    text: "Qoralama",
+    hint: "Kurs hali talabalarga ko'rinmaydi. Tayyor bo'lgach, nashr qiling.",
+    className: "bg-amber-50 text-amber-700",
+  },
+  HIDDEN: {
+    text: "Yashirin",
+    hint: "Kurs katalogdan olib tashlangan. Sotib olgan talabalar uni ko'rishda davom etadi.",
+    className: "bg-gray-100 text-gray-600",
+  },
+};
 
-export default function CourseEditForm({ course }: { course: Course }) {
+function errorMessage(err: unknown) {
+  return err instanceof ApiError ? err.message : "Xatolik yuz berdi";
+}
+
+export default function CourseEditForm({ courseId }: { courseId: number }) {
   const router = useRouter();
-  const nextId = useRef(initialLessons.length + 1);
+  const { token } = useAuth();
 
+  const [course, setCourse] = useState<ApiInstructorCourse | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
+  const [lessons, setLessons] = useState<ApiLesson[]>([]);
   const [form, setForm] = useState({
-    title: course.title,
-    category: course.category,
-    description: `Bu kursda ${course.category.toLowerCase()} sohasidagi asosiy va amaliy ko'nikmalarni bosqichma-bosqich o'rganasiz.`,
-    price: String(Number(course.price.replace(/[^\d]/g, ""))),
-    status: "Faol",
+    title: "",
+    category: "",
+    description: "",
+    price: "",
+    imageUrl: "",
   });
-  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [newLesson, setNewLesson] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-    function handleChange(e: React.ChangeEvent<FieldElement>) {
+  useEffect(() => {
+    if (!token) return;
+    Promise.all([
+      getInstructorCourse(token, courseId),
+      getCourseLessons(token, courseId),
+      getCategories(),
+    ])
+      .then(([c, l, cats]) => {
+        setCourse(c);
+        setLessons(l);
+        setCategories(cats);
+        setForm({
+          title: c.title,
+          category: c.category,
+          description: c.description ?? "",
+          price: String(c.price),
+          imageUrl: c.imageUrl ?? "",
+        });
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && [403, 404].includes(err.status)) {
+          setNotFound(true);
+        } else {
+          toast.error(errorMessage(err));
+        }
+      });
+  }, [token, courseId]);
+
+  if (notFound) {
+    return (
+      <div className="text-center py-16 border border-dashed border-gray-300 rounded-xl">
+        <p className="text-gray-500 mb-4">Kurs topilmadi yoki u sizga tegishli emas.</p>
+        <Link href="/ustoz/panel" className="text-indigo-700 font-medium hover:underline">
+          Ustoz paneliga qaytish →
+        </Link>
+      </div>
+    );
+  }
+
+  if (!course || !token) {
+    return <p className="text-gray-400">Yuklanmoqda...</p>;
+  }
+
+  const status = statusInfo[course.status];
+
+  function handleChange(e: React.ChangeEvent<FieldElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function addLesson() {
-    const id = nextId.current++;
-    setLessons((prev) => [...prev, { id, title: "" }]);
-  }
-
-  function updateLesson(id: number, title: string) {
-    setLessons((prev) => prev.map((l) => (l.id === id ? { ...l, title } : l)));
-  }
-
-  function removeLesson(id: number) {
-    setLessons((prev) => prev.filter((l) => l.id !== id));
-  }
-
-  function moveLesson(index: number, dir: -1 | 1) {
-    setLessons((prev) => {
-      const target = index + dir;
-      if (target < 0 || target >= prev.length) return prev;
-      const copy = [...prev];
-      [copy[index], copy[target]] = [copy[target], copy[index]];
-      return copy;
-    });
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Tahrirlangan kurs:", { ...form, lessons });
-    toast(mockNotice, { icon: "ℹ️" });
-    router.push("/ustoz/panel");
+    if (!token) return;
+    setSaving(true);
+    try {
+      const updated = await updateCourse(token, courseId, {
+        title: form.title,
+        category: form.category,
+        description: form.description,
+        price: Number(form.price),
+        imageUrl: form.imageUrl.trim() || undefined,
+      });
+      setCourse(updated);
+      setForm((f) => ({ ...f, imageUrl: updated.imageUrl }));
+      toast.success("O'zgarishlar saqlandi");
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handleDelete() {
-    if (confirm("Bu kursni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.")) {
-      toast(mockNotice, { icon: "ℹ️" });
+  async function changeStatus(next: CourseStatus) {
+    if (!token) return;
+    if (next === "ACTIVE" && lessons.length === 0) {
+      toast.error("Nashr qilishdan oldin kamida bitta dars qo'shing");
+      return;
+    }
+    setBusy(true);
+    try {
+      setCourse(await updateCourseStatus(token, courseId, next));
+      toast.success(next === "ACTIVE" ? "Kurs nashr qilindi" : "Kurs holati o'zgartirildi");
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function addLesson() {
+    if (!token || !newLesson.trim()) return;
+    setBusy(true);
+    try {
+      const lesson = await createLesson(token, courseId, newLesson.trim());
+      setLessons((prev) => [...prev, lesson]);
+      setNewLesson("");
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function renameLesson(lesson: ApiLesson, title: string) {
+    if (!token) return;
+    const trimmed = title.trim();
+    if (!trimmed || trimmed === lesson.title) return;
+    try {
+      const updated = await updateLesson(token, courseId, lesson.id, trimmed);
+      setLessons((prev) => prev.map((l) => (l.id === lesson.id ? updated : l)));
+      toast.success("Dars nomi saqlandi");
+    } catch (err) {
+      toast.error(errorMessage(err));
+    }
+  }
+
+  async function removeLesson(lesson: ApiLesson) {
+    if (!token) return;
+    if (!confirm(`"${lesson.title}" darsini o'chirmoqchimisiz?`)) return;
+    setBusy(true);
+    try {
+      await deleteLesson(token, courseId, lesson.id);
+      setLessons((prev) => prev.filter((l) => l.id !== lesson.id));
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function moveLesson(index: number, dir: -1 | 1) {
+    if (!token) return;
+    const target = index + dir;
+    if (target < 0 || target >= lessons.length) return;
+
+    const previous = lessons;
+    const reordered = [...lessons];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    setLessons(reordered);
+
+    try {
+      await reorderLessons(token, courseId, reordered.map((l) => l.id));
+    } catch (err) {
+      setLessons(previous);
+      toast.error(errorMessage(err));
+    }
+  }
+
+  async function handleDelete() {
+    if (!token) return;
+    if (!confirm("Bu kursni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.")) return;
+    setBusy(true);
+    try {
+      await deleteCourse(token, courseId);
+      toast.success("Kurs o'chirildi");
       router.push("/ustoz/panel");
+    } catch (err) {
+      toast.error(errorMessage(err));
+      setBusy(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10">
-      <div className="space-y-5">
+    <div className="space-y-10">
+      <div className="border border-gray-200 rounded-xl p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600">Holati:</span>
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${status.className}`}>
+              {status.text}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {course.status !== "ACTIVE" && (
+              <button
+                type="button"
+                onClick={() => changeStatus("ACTIVE")}
+                disabled={busy}
+                className="text-sm font-medium bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 disabled:opacity-60"
+              >
+                Nashr qilish
+              </button>
+            )}
+            {course.status === "ACTIVE" && (
+              <>
+                <Link
+                  href={`/kurslar/${course.slug}`}
+                  className="flex items-center gap-1.5 text-sm font-medium border border-gray-300 text-gray-700 px-3 py-2 rounded-md hover:border-indigo-400 hover:text-indigo-700"
+                >
+                  <Eye className="w-4 h-4" />
+                  Ko&apos;rish
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => changeStatus("HIDDEN")}
+                  disabled={busy}
+                  className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 disabled:opacity-60"
+                >
+                  Yashirish
+                </button>
+              </>
+            )}
+            {course.status === "HIDDEN" && (
+              <button
+                type="button"
+                onClick={() => changeStatus("DRAFT")}
+                disabled={busy}
+                className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 disabled:opacity-60"
+              >
+                Qoralamaga qaytarish
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-3">{status.hint}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <h2 className="font-semibold text-gray-900">Asosiy ma&apos;lumotlar</h2>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kurs nomi
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Kurs nomi</label>
           <input
             type="text"
             name="title"
@@ -108,9 +305,7 @@ export default function CourseEditForm({ course }: { course: Course }) {
 
         <div className="grid sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Kategoriya
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kategoriya</label>
             <select
               name="category"
               value={form.category}
@@ -118,7 +313,7 @@ export default function CourseEditForm({ course }: { course: Course }) {
               className={`${inputClass} bg-white`}
             >
               {categories.map((cat) => (
-                <option key={cat.title} value={cat.title}>
+                <option key={cat.id} value={cat.title}>
                   {cat.title}
                 </option>
               ))}
@@ -142,9 +337,7 @@ export default function CourseEditForm({ course }: { course: Course }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kurs tavsifi
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Kurs tavsifi</label>
           <textarea
             name="description"
             value={form.description}
@@ -157,58 +350,52 @@ export default function CourseEditForm({ course }: { course: Course }) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Holati
+            Muqova rasmi havolasi
           </label>
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className={`${inputClass} bg-white sm:max-w-xs`}
-          >
-            <option value="Faol">Faol (talabalarga ko&apos;rinadi)</option>
-            <option value="Qoralama">Qoralama (yashirin)</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="font-semibold text-gray-900">Kurs muqovasi</h2>
-        <div className="flex flex-col sm:flex-row gap-4 items-start">
-          <div className="relative w-full sm:w-56 h-32 rounded-lg overflow-hidden shrink-0">
-            <Image
-              src={course.image}
-              alt={course.title}
-              fill
-              sizes="224px"
-              className="object-cover"
-            />
-          </div>
-          <div className="flex-1 w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-400 transition cursor-pointer">
-            <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">
-              Yangi rasm yuklash uchun bosing
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Fayl yuklash backend ulangandan keyin ishlaydi
-            </p>
+          <div className="flex flex-col sm:flex-row gap-4 items-start">
+            <div className="relative w-full sm:w-48 h-28 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+              <Image
+                src={coverOf(form.imageUrl)}
+                alt={form.title || "Muqova"}
+                fill
+                sizes="192px"
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 w-full">
+              <input
+                type="url"
+                name="imageUrl"
+                value={form.imageUrl}
+                onChange={handleChange}
+                placeholder="https://..."
+                className={inputClass}
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                https:// bilan boshlanadigan rasm havolasini kiriting. Bo&apos;sh qolsa, standart
+                muqova ishlatiladi.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+        >
+          {saving ? "Saqlanmoqda..." : "O'zgarishlarni saqlash"}
+        </button>
+      </form>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900">
-            Darslar dasturi ({lessons.length})
-          </h2>
-          <button
-            type="button"
-            onClick={addLesson}
-            className="flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:underline"
-          >
-            <Plus className="w-4 h-4" />
-            Dars qo&apos;shish
-          </button>
-        </div>
+        <h2 className="font-semibold text-gray-900">Darslar dasturi ({lessons.length})</h2>
+
+        {lessons.length === 0 && (
+          <p className="text-sm text-gray-500">
+            Hali dars yo&apos;q. Kursni nashr qilish uchun kamida bitta dars qo&apos;shing.
+          </p>
+        )}
 
         <div className="space-y-2">
           {lessons.map((lesson, i) => (
@@ -218,15 +405,15 @@ export default function CourseEditForm({ course }: { course: Course }) {
               </span>
               <input
                 type="text"
-                value={lesson.title}
-                onChange={(e) => updateLesson(lesson.id, e.target.value)}
-                placeholder="Dars nomi"
+                defaultValue={lesson.title}
+                onBlur={(e) => renameLesson(lesson, e.target.value)}
+                aria-label="Dars nomi"
                 className={inputClass}
               />
               <button
                 type="button"
                 onClick={() => moveLesson(i, -1)}
-                disabled={i === 0}
+                disabled={i === 0 || busy}
                 aria-label="Yuqoriga"
                 className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
               >
@@ -235,7 +422,7 @@ export default function CourseEditForm({ course }: { course: Course }) {
               <button
                 type="button"
                 onClick={() => moveLesson(i, 1)}
-                disabled={i === lessons.length - 1}
+                disabled={i === lessons.length - 1 || busy}
                 aria-label="Pastga"
                 className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
               >
@@ -243,14 +430,40 @@ export default function CourseEditForm({ course }: { course: Course }) {
               </button>
               <button
                 type="button"
-                onClick={() => removeLesson(lesson.id)}
+                onClick={() => removeLesson(lesson)}
+                disabled={busy}
                 aria-label="O'chirish"
-                className="p-1.5 text-gray-400 hover:text-red-600"
+                className="p-1.5 text-gray-400 hover:text-red-600 disabled:opacity-30"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newLesson}
+            onChange={(e) => setNewLesson(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addLesson();
+              }
+            }}
+            placeholder="Yangi dars nomi"
+            className={inputClass}
+          />
+          <button
+            type="button"
+            onClick={addLesson}
+            disabled={busy || !newLesson.trim()}
+            className="flex items-center gap-1.5 text-sm font-medium bg-indigo-700 text-white px-4 rounded-md hover:bg-indigo-800 disabled:opacity-60 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            Qo&apos;shish
+          </button>
         </div>
 
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
@@ -261,39 +474,21 @@ export default function CourseEditForm({ course }: { course: Course }) {
         </div>
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row gap-3">
-        <Link
-          href="/ustoz/panel"
-          className="text-center border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-md hover:bg-gray-50"
-        >
-          Bekor qilish
-        </Link>
-        <button
-          type="submit"
-          className="flex-1 bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800"
-        >
-          O&apos;zgarishlarni saqlash
-        </button>
-      </div>
-
       <div className="border border-red-200 bg-red-50/50 rounded-xl p-5">
         <h2 className="font-semibold text-red-700 text-sm">Xavfli hudud</h2>
         <p className="text-sm text-gray-600 mt-1">
-          Kurs o&apos;chirilsa, uni qayta tiklab bo&apos;lmaydi.
+          Kurs o&apos;chirilsa, uni qayta tiklab bo&apos;lmaydi. Sotib olingan kursni o&apos;chirib
+          bo&apos;lmaydi — uni yashiring.
         </p>
         <button
           type="button"
           onClick={handleDelete}
-          className="mt-3 text-sm font-medium text-red-600 border border-red-300 px-4 py-2 rounded-md hover:bg-red-50"
+          disabled={busy}
+          className="mt-3 text-sm font-medium text-red-600 border border-red-300 px-4 py-2 rounded-md hover:bg-red-50 disabled:opacity-60"
         >
           Kursni o&apos;chirish
         </button>
       </div>
-
-      <p className="text-xs text-gray-400">
-        Namuna rejim: o&apos;zgarishlar hozircha saqlanmaydi, backend ulangandan
-        keyin ishlaydi.
-      </p>
-    </form>
+    </div>
   );
 }

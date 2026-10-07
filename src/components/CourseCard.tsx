@@ -6,6 +6,7 @@ import { ShoppingCart, Check } from "lucide-react";
 import { categories } from "@/lib/categories";
 import { useCart } from "@/lib/cart/CartContext";
 import { formatPrice } from "@/lib/format";
+import { coverOf } from "@/lib/images";
 import type { ApiCourseCard } from "@/lib/api";
 
 export default function CourseCard({ course }: { course: ApiCourseCard }) {
@@ -30,7 +31,7 @@ export default function CourseCard({ course }: { course: ApiCourseCard }) {
       <Link href={`/kurslar/${course.slug}`} className="block">
         <div className="relative h-32 w-full">
           <Image
-            src={course.imageUrl}
+            src={coverOf(course.imageUrl)}
             alt={course.title}
             fill
             sizes="(max-width: 640px) 50vw, 260px"

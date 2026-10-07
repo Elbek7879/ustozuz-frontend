@@ -103,8 +103,8 @@ function InstructorPanelContent() {
                       {course.title}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {course.category} • {course.studentsCount} talaba •{" "}
-                      {course.rating} ⭐
+                      {course.category} • {course.lessonsCount} dars •{" "}
+                      {course.studentsCount} talaba • {course.rating} ⭐
                     </p>
                   </div>
 

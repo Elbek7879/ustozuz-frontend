@@ -1,26 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Upload, Video } from "lucide-react";
+import { Video } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { categories } from "@/lib/categories";
-import { createCourse, ApiError } from "@/lib/api";
+import { createCourse, getCategories, ApiError, type ApiCategory } from "@/lib/api";
+
+const inputClass =
+  "w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500";
 
 function CreateCourseForm() {
   const router = useRouter();
   const { token } = useAuth();
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [form, setForm] = useState({
     title: "",
     category: "",
     description: "",
     price: "",
+    imageUrl: "",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(() => toast.error("Kategoriyalarni yuklab bo'lmadi"));
+  }, []);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -34,18 +44,18 @@ function CreateCourseForm() {
 
     setLoading(true);
     try {
-      await createCourse(token, {
+      const course = await createCourse(token, {
         title: form.title,
         category: form.category,
         description: form.description,
         price: Number(form.price),
+        imageUrl: form.imageUrl.trim() || undefined,
       });
-      toast.success("Kurs yaratildi");
-      router.push("/ustoz/panel");
+      toast.success("Kurs yaratildi. Endi darslarni qo'shing va nashr qiling");
+      router.push(`/ustoz/kurslar/${course.id}/tahrirlash`);
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Xatolik yuz berdi";
       toast.error(message);
-    } finally {
       setLoading(false);
     }
   }
@@ -56,7 +66,8 @@ function CreateCourseForm() {
         Yangi kurs yaratish
       </h1>
       <p className="text-gray-500 text-sm mb-8">
-        Kursingiz haqida asosiy ma&apos;lumotlarni kiriting
+        Kursingiz haqida asosiy ma&apos;lumotlarni kiriting. Keyingi qadamda darslarni
+        qo&apos;shasiz.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -71,7 +82,7 @@ function CreateCourseForm() {
             onChange={handleChange}
             required
             placeholder="Masalan: Frontend dasturlash: noldan mutaxassisgacha"
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+            className={inputClass}
           />
         </div>
 
@@ -84,11 +95,11 @@ function CreateCourseForm() {
             value={form.category}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 bg-white"
+            className={`${inputClass} bg-white`}
           >
             <option value="">Kategoriyani tanlang</option>
             {categories.map((cat) => (
-              <option key={cat.title} value={cat.title}>
+              <option key={cat.id} value={cat.title}>
                 {cat.title}
               </option>
             ))}
@@ -106,7 +117,7 @@ function CreateCourseForm() {
             required
             rows={4}
             placeholder="Kursingizda nimalar o'rgatilishini qisqacha tasvirlab bering..."
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 resize-none"
+            className={`${inputClass} resize-none`}
           />
         </div>
 
@@ -122,23 +133,25 @@ function CreateCourseForm() {
             required
             min={0}
             placeholder="Masalan: 249000"
-            className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+            className={inputClass}
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kurs muqovasi (rasm)
+            Muqova rasmi havolasi (ixtiyoriy)
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-indigo-400 transition cursor-pointer">
-            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">
-              Rasm yuklash tez orada qo&apos;shiladi
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Hozircha standart rasm qo&apos;yiladi
-            </p>
-          </div>
+          <input
+            type="url"
+            name="imageUrl"
+            value={form.imageUrl}
+            onChange={handleChange}
+            placeholder="https://..."
+            className={inputClass}
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Bo&apos;sh qoldirsangiz, standart muqova qo&apos;yiladi.
+          </p>
         </div>
 
         <div>
@@ -151,7 +164,7 @@ function CreateCourseForm() {
               Video yuklash funksiyasi tez orada qo&apos;shiladi
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              Hozircha kursni saqlab, darslar ro&apos;yxatini keyin to&apos;ldirishingiz mumkin
+              Kursni saqlagach, darslar ro&apos;yxatini keyingi sahifada to&apos;ldirasiz
             </p>
           </div>
         </div>
@@ -161,7 +174,7 @@ function CreateCourseForm() {
           disabled={loading}
           className="w-full bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 disabled:opacity-60"
         >
-          {loading ? "Saqlanmoqda..." : "Kursni saqlash"}
+          {loading ? "Saqlanmoqda..." : "Kursni saqlash va davom etish"}
         </button>
       </form>
     </section>
