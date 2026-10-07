@@ -99,10 +99,18 @@ export function getCategories() {
   return apiFetch<ApiCategory[]>("/categories");
 }
 
-export function getCourses(params?: { category?: string; q?: string }) {
+export function getCourses(params?: {
+  category?: string;
+  q?: string;
+  size?: number;
+  // Spring formatida, masalan "createdAt,desc" yoki "studentsCount,desc"
+  sort?: string;
+}) {
   const search = new URLSearchParams();
   if (params?.category) search.set("category", params.category);
   if (params?.q) search.set("q", params.q);
+  if (params?.size) search.set("size", String(params.size));
+  if (params?.sort) search.set("sort", params.sort);
   const query = search.toString();
   return apiFetch<ApiPage<ApiCourseCard>>(`/courses${query ? `?${query}` : ""}`);
 }

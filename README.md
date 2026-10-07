@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UstozUz — frontend
 
-## Getting Started
+O'zbekiston uchun onlayn ta'lim platformasi: talabalar kurs sotib oladi va o'qiydi,
+ustozlar kurs yaratadi, admin platformani boshqaradi.
 
-First, run the development server:
+Next.js 16 (App Router), TypeScript, Tailwind CSS. Backend — alohida repo (`ustozuz-backend`, Spring Boot).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Imkoniyatlar
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Katalog**: kategoriyalar, qidiruv, kurs sahifasi va darslar dasturi
+- **Talaba**: ro'yxatdan o'tish, savat, to'lov (sinov rejimi: Payme / Click / karta),
+  "Mening kurslarim", darslarni tugatish va progress, avtomatik sertifikat (PDF qilib saqlash mumkin), profil
+- **Ustoz**: kurs yaratish va tahrirlash, darslarni qo'shish/tartiblash, nashr qilish yoki yashirish
+- **Admin**: statistika va daromad, foydalanuvchilarni boshqarish (rol, bloklash), kurslarni boshqarish,
+  aloqa xabarlari
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Lokal ishga tushirish
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. `.env.local` fayli:
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:8080/api
+   ```
+2. Backend ishlab turgan bo'lsin (localhost:8080).
+3. ```bash
+   npm install
+   npm run dev
+   ```
+   → http://localhost:3000
 
-## Learn More
+## Tuzilma
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app` — sahifalar (`/kurslar`, `/savat`, `/tolov`, `/talaba/*`, `/ustoz/*`, `/admin/*` ...)
+- `src/components` — qayta ishlatiladigan qismlar
+- `src/lib/api.ts` — backend bilan ishlash
+- `src/lib/auth`, `src/lib/cart`, `src/lib/enrollments` — sessiya, savat va sotib olingan kurslar holati

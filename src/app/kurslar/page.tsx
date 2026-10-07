@@ -12,7 +12,7 @@ type Props = {
 export default async function CoursesPage({ searchParams }: Props) {
   const { kategoriya, qidiruv } = await searchParams;
 
-  const data = await getCourses({ category: kategoriya, q: qidiruv });
+  const data = await getCourses({ category: kategoriya, q: qidiruv, size: 100, sort: "createdAt,desc" });
 
   const heading = qidiruv
     ? `"${qidiruv}" bo'yicha natijalar`

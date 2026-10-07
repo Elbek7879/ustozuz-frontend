@@ -3,7 +3,7 @@ import { getCourses } from "@/lib/api";
 import CourseCard from "@/components/CourseCard";
 
 export default async function Courses() {
-  const data = await getCourses();
+  const data = await getCourses({ size: 12, sort: "studentsCount,desc" });
   const loopedCourses = [...data.items, ...data.items];
 
   return (
