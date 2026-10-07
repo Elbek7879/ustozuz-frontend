@@ -37,8 +37,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(savedToken);
         setUser(u);
       })
-      .catch(() => {
-        localStorage.removeItem("ustozuz_token");
+      .catch((err) => {
+        // Token yaroqsiz yoki foydalanuvchi bloklangan/o'chirilgan bo'lsa chiqaramiz.
+        // Backend vaqtincha javob bermasa, token saqlanib qoladi.
+        if (err instanceof ApiError && [401, 403, 404].includes(err.status)) {
+          localStorage.removeItem("ustozuz_token");
+        }
       })
       .finally(() => setLoading(false));
   }, []);
