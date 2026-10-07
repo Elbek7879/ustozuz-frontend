@@ -5,7 +5,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { ArrowLeft, Mail, KeyRound } from "lucide-react";
 import Header from "@/components/Header";
-import { forgotPasswordRequest } from "@/lib/api";
+import { forgotPasswordRequest, ApiError } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -18,8 +18,10 @@ export default function ForgotPasswordPage() {
     try {
       await forgotPasswordRequest(email);
       setSent(true);
-    } catch {
-      toast.error("Server bilan bog'lanib bo'lmadi. Qayta urinib ko'ring");
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : "Server bilan bog'lanib bo'lmadi. Qayta urinib ko'ring"
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +85,8 @@ export default function ForgotPasswordPage() {
               yangilash havolasi yuboriladi.
             </p>
             <p className="text-gray-400 text-xs mt-4">
-              Xat kelmasa, &quot;Spam&quot; papkasini ham tekshiring.
+              Havola 1 soat amal qiladi. Xat bir necha daqiqada kelmasa,
+              &quot;Spam&quot; papkasini ham tekshiring.
             </p>
 
             <button
