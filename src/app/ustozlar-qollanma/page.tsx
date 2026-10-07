@@ -1,7 +1,7 @@
 import Link from "next/link";
 import InfoPage from "@/components/InfoPage";
 
-export const metadata = { title: "Ustozlar uchun qo'llanma — UstozUz" };
+export const metadata = { title: "Ustozlar uchun qo'llanma" };
 
 const steps = [
   {

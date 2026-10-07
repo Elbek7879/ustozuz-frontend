@@ -1,7 +1,7 @@
 import InfoPage from "@/components/InfoPage";
 import { Target, Users, ShieldCheck, Lightbulb } from "lucide-react";
 
-export const metadata = { title: "Biz haqimizda — UstozUz" };
+export const metadata = { title: "Biz haqimizda" };
 
 const values = [
   {

@@ -1,7 +1,7 @@
 import InfoPage from "@/components/InfoPage";
 import { Briefcase } from "lucide-react";
 
-export const metadata = { title: "Karyera — UstozUz" };
+export const metadata = { title: "Karyera" };
 
 export default function CareersPage() {
   return (

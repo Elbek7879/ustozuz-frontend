@@ -5,6 +5,8 @@ import CourseCard from "@/components/CourseCard";
 import { categories } from "@/lib/categories";
 import { getCourses } from "@/lib/api";
 
+export const metadata = { title: "Barcha kurslar" };
+
 type Props = {
   searchParams: Promise<{ kategoriya?: string; qidiruv?: string }>;
 };

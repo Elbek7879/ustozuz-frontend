@@ -2,7 +2,7 @@ import InfoPage from "@/components/InfoPage";
 import ContactForm from "@/components/ContactForm";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
-export const metadata = { title: "Aloqa — UstozUz" };
+export const metadata = { title: "Aloqa" };
 
 const info = [
   { icon: Mail, label: "Elektron pochta", value: "info@ustozuz.uz" },

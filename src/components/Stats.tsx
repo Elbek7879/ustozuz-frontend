@@ -1,12 +1,13 @@
 import { getPublicStats } from "@/lib/api";
+import { formatNumber } from "@/lib/format";
 
 export default async function Stats() {
   const stats = await getPublicStats();
 
   const items = [
-    { value: `${stats.totalCourses}+`, label: "Kurslar" },
-    { value: `${stats.totalStudents}+`, label: "Talabalar" },
-    { value: `${stats.totalInstructors}+`, label: "Ustozlar" },
+    { value: `${formatNumber(stats.totalCourses)}+`, label: "Kurslar" },
+    { value: `${formatNumber(stats.totalStudents)}+`, label: "Talabalar" },
+    { value: `${formatNumber(stats.totalInstructors)}+`, label: "Ustozlar" },
     { value: stats.avgRating.toFixed(1), label: "O'rtacha reyting" },
   ];
 

@@ -4,7 +4,7 @@ import TopicsCarousel from "@/components/TopicsCarousel";
 import SkillsTabs from "@/components/SkillsTabs";
 
 export const metadata = {
-  title: "Ommabop mavzular — UstozUz",
+  title: "Ommabop mavzular",
 };
 
 export default function PopularTopicsPage() {

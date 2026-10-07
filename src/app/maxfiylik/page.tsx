@@ -1,6 +1,6 @@
 import InfoPage from "@/components/InfoPage";
 
-export const metadata = { title: "Maxfiylik siyosati — UstozUz" };
+export const metadata = { title: "Maxfiylik siyosati" };
 
 const sections = [
   {

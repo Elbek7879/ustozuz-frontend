@@ -3,6 +3,8 @@ import { CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+export const metadata = { title: "To'lov qabul qilindi" };
+
 export default function PaymentSuccessPage() {
   return (
     <main>

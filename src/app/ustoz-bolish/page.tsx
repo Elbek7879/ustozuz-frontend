@@ -59,6 +59,8 @@ const steps = [
   },
 ];
 
+export const metadata = { title: "Ustoz bo'lish" };
+
 export default function BecomeInstructorPage() {
   return (
     <main>

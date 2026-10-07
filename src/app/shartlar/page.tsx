@@ -1,6 +1,6 @@
 import InfoPage from "@/components/InfoPage";
 
-export const metadata = { title: "Foydalanish shartlari — UstozUz" };
+export const metadata = { title: "Foydalanish shartlari" };
 
 const sections = [
   {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import InfoPage from "@/components/InfoPage";
 import { BookOpen, CheckCircle2, Award } from "lucide-react";
 
-export const metadata = { title: "Sertifikatlar — UstozUz" };
+export const metadata = { title: "Sertifikatlar" };
 
 const steps = [
   {

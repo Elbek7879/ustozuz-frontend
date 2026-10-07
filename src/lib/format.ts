@@ -22,3 +22,8 @@ export function timeAgo(iso: string) {
   if (days < 30) return `${days} kun oldin`;
   return formatDate(iso);
 }
+
+// 12950 -> "12 950"
+export function formatNumber(n: number) {
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}

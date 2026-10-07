@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import { getCategories } from "@/lib/api";
 import { categories as localMeta } from "@/lib/categories";
 
+export const metadata = { title: "Kategoriyalar" };
+
 // Kurslar soni bazadan olinadi, shuning uchun sahifa har so'rovda yangilanadi
 export const dynamic = "force-dynamic";
 

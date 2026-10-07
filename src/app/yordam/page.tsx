@@ -1,7 +1,7 @@
 import InfoPage from "@/components/InfoPage";
 import { ChevronDown } from "lucide-react";
 
-export const metadata = { title: "Yordam markazi — UstozUz" };
+export const metadata = { title: "Yordam markazi" };
 
 const faqs = [
   {

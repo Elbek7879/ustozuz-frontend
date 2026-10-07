@@ -9,6 +9,20 @@ import { formatPrice } from "@/lib/format";
 import { coverOf } from "@/lib/images";
 import AddToCartButton from "@/components/AddToCartButton";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  try {
+    const course = await getCourseBySlug(slug);
+    return { title: course.title, description: course.description };
+  } catch {
+    return { title: "Kurs topilmadi" };
+  }
+}
+
 export default async function CourseDetailPage({
   params,
 }: {
