@@ -2,27 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ShoppingCart, Menu, X, Search, User, LogOut, BookOpen } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, BookOpen } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import Logo from "@/components/Logo";
+import LiveSearch from "@/components/LiveSearch";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function Header() {
   const { items } = useCart();
   const { user, logout, loading } = useAuth();
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [query, setQuery] = useState("");
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    setMenuOpen(false);
-    router.push(`/kurslar?qidiruv=${encodeURIComponent(q)}`);
-  }
 
   function dashboardLink() {
     if (user?.role === "ADMIN") return "/admin";
@@ -35,19 +25,9 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 gap-6">
         <Logo />
 
-        <form onSubmit={handleSearch} role="search" className="hidden md:flex flex-1 max-w-xl">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Kurs, ustoz yoki kategoriya qidiring"
-              aria-label="Qidiruv"
-              className="w-full bg-gray-100/80 border border-transparent rounded-full py-2.5 pl-10 pr-5 text-sm placeholder:text-gray-500 focus:outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition"
-            />
-          </div>
-        </form>
+        <div className="hidden md:flex flex-1 max-w-xl">
+          <LiveSearch />
+        </div>
 
         <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-700 shrink-0">
           <Link href="/kategoriyalar" className="px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-indigo-700 transition">
@@ -148,16 +128,7 @@ export default function Header() {
 
       {menuOpen && (
         <div className="lg:hidden border-t border-gray-200 px-6 py-4 space-y-4">
-          <form onSubmit={handleSearch} role="search">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Kurs, ustoz yoki kategoriya qidiring"
-              aria-label="Qidiruv"
-              className="w-full border border-gray-300 rounded-full py-2 px-5 text-sm focus:outline-none focus:border-indigo-500"
-            />
-          </form>
+          <LiveSearch mobile onNavigate={() => setMenuOpen(false)} />
 
           <nav className="flex flex-col gap-3 text-sm font-medium text-gray-700">
             <Link href="/kategoriyalar" onClick={() => setMenuOpen(false)}>
