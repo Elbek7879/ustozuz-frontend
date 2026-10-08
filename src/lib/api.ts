@@ -326,7 +326,22 @@ export type ApiCertificate = {
   courseSlug: string;
   instructorName: string;
   issuedAt: string;
+  // QR kod va ochiq tekshiruv havolasi uchun: UZ-000001-<imzo>
+  verifyCode: string;
 };
+
+export type ApiPublicCertificate = {
+  number: string;
+  studentName: string;
+  courseTitle: string;
+  courseSlug: string;
+  instructorName: string;
+  issuedAt: string;
+};
+
+export function verifyCertificate(code: string) {
+  return apiFetch<ApiPublicCertificate>(`/certificates/verify/${encodeURIComponent(code)}`);
+}
 
 export function getEnrolledCourses(token: string) {
   return apiFetch<ApiEnrolledCourse[]>("/me/courses", { token });

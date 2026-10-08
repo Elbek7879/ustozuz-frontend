@@ -139,6 +139,7 @@ function CertificatesContent() {
           date={formatDate(selected.issuedAt)}
           number={selected.number}
           instructorName={selected.instructorName}
+          verifyCode={selected.verifyCode}
         />
       )}
     </section>

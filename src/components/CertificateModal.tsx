@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, Award, Download } from "lucide-react";
+import { X, Award, Download, ShieldCheck } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 type Props = {
   onClose: () => void;
@@ -10,6 +11,7 @@ type Props = {
   date: string;
   number?: string;
   instructorName?: string;
+  verifyCode?: string;
   sample?: boolean;
 };
 
@@ -20,8 +22,12 @@ export default function CertificateModal({
   date,
   number,
   instructorName,
+  verifyCode,
   sample = false,
 }: Props) {
+  // QR kod joriy sayt manzilidagi ochiq tekshiruv sahifasiga olib boradi
+  const verifyUrl = verifyCode && typeof window !== "undefined" ? `${window.location.origin}/sertifikat/${verifyCode}` : null;
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -109,6 +115,29 @@ export default function CertificateModal({
                   <p className="text-sm font-semibold text-gray-800">ustozuz.vercel.app</p>
                 </div>
               </div>
+
+              {verifyUrl && (
+                <div className="mt-6 pt-5 border-t border-dashed border-gray-200 flex items-center gap-4 text-left">
+                  <QRCodeSVG
+                    value={verifyUrl}
+                    size={76}
+                    level="M"
+                    className="shrink-0 rounded-lg bg-white p-1 ring-1 ring-gray-200"
+                  />
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-xs font-bold text-gray-800">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      Haqiqiyligini tekshirish
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-gray-500">
+                      QR kodni telefon kamerasi bilan skanerlang yoki havolani oching:
+                    </p>
+                    <p className="mt-1 text-[11px] font-mono text-indigo-700 break-all">
+                      {verifyUrl.replace(/^https?:\/\//, "")}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -126,6 +155,16 @@ export default function CertificateModal({
             <Download className="w-4 h-4" />
             Chop etish / PDF saqlash
           </button>
+        )}
+        {verifyUrl && !sample && (
+          <a
+            href={verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="print:hidden mt-3 block text-center text-sm font-medium text-white/80 hover:text-white"
+          >
+            Tekshirish sahifasini ochish ↗
+          </a>
         )}
       </div>
     </div>
