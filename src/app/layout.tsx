@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
@@ -35,6 +35,16 @@ export const metadata: Metadata = {
     title: "UstozUz — Onlayn ta'lim platformasi",
     description: siteDescription,
   },
+  // iPhone'da bosh ekrandan ochilganda ilova kabi ko'rinadi
+  appleWebApp: {
+    capable: true,
+    title: "UstozUz",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#4f46e5",
 };
 
 export default function RootLayout({
