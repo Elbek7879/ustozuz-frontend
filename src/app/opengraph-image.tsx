@@ -5,7 +5,28 @@ export const alt = "UstozUz — O'zbekistondagi eng yaxshi ustozlardan onlayn o'
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+// Google Fonts'dan Inter (qalin) shriftini oladi; olinmasa standart shrift ishlatiladi
+async function loadInter(weight: number): Promise<ArrayBuffer | null> {
+  try {
+    const css = await (
+      await fetch(`https://fonts.googleapis.com/css2?family=Inter:wght@${weight}`, {
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.30 (KHTML, like Gecko)" },
+      })
+    ).text();
+    const url = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/)?.[1];
+    return url ? await (await fetch(url)).arrayBuffer() : null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function OpengraphImage() {
+  const [bold, regular] = await Promise.all([loadInter(800), loadInter(500)]);
+  const fonts = [
+    ...(bold ? [{ name: "Inter", data: bold, weight: 800 as const, style: "normal" as const }] : []),
+    ...(regular ? [{ name: "Inter", data: regular, weight: 500 as const, style: "normal" as const }] : []),
+  ];
+
   return new ImageResponse(
     (
       <div
@@ -18,7 +39,7 @@ export default function OpengraphImage() {
           padding: "72px 80px",
           background: "linear-gradient(135deg, #312e81 0%, #4f46e5 45%, #7c3aed 100%)",
           color: "white",
-          fontFamily: "sans-serif",
+          fontFamily: fonts.length ? "Inter" : "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
@@ -39,7 +60,8 @@ export default function OpengraphImage() {
             U
           </div>
           <div style={{ display: "flex", fontSize: 44, fontWeight: 800 }}>
-            Ustoz<span style={{ color: "#c7d2fe" }}>Uz</span>
+            <span>Ustoz</span>
+            <span style={{ color: "#c7d2fe" }}>Uz</span>
           </div>
         </div>
 
@@ -71,6 +93,6 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    size
+    { ...size, fonts }
   );
 }
