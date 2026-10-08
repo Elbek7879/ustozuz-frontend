@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, TrendingUp } from "lucide-react";
-import { skills, formatNumber, type SkillGroup } from "@/lib/skills";
+import { skills, type SkillGroup } from "@/lib/skills";
 
 const featured = skills.find((s) => s.name === "Sun'iy intellekt")!;
 const columns: SkillGroup[] = ["Dasturlash", "Dizayn", "Biznes"];
@@ -32,9 +32,6 @@ export default function PopularSkills() {
               AI kurslarini ko&apos;ring
               <ChevronRight className="w-4 h-4 shrink-0 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="text-xs text-gray-500 mt-1">
-              Talabalar: {formatNumber(featured.students)}
-            </p>
 
             <Link
               href="/ommabop-mavzular"
@@ -48,7 +45,7 @@ export default function PopularSkills() {
           {columns.map((group) => (
             <div key={group}>
               <h3 className="text-xl font-bold text-gray-900 mb-4">{group}</h3>
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {topSkills(group).map((s) => (
                   <div key={s.name}>
                     <Link
@@ -58,9 +55,6 @@ export default function PopularSkills() {
                       {s.name}
                       <ChevronRight className="w-4 h-4 shrink-0 group-hover:translate-x-1 transition-transform" />
                     </Link>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Talabalar: {formatNumber(s.students)}
-                    </p>
                   </div>
                 ))}
               </div>

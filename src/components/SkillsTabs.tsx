@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
-import { skills, formatNumber } from "@/lib/skills";
+import { skills } from "@/lib/skills";
 
 const tabs = [
   "Eng ko'p o'rganilgan",
@@ -55,9 +55,6 @@ export default function SkillsTabs() {
               >
                 {s.name}
               </Link>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {formatNumber(s.students)} ta talaba
-              </p>
             </div>
 
             <p className="col-start-2 md:col-start-auto flex items-center gap-2 text-sm text-gray-600">
