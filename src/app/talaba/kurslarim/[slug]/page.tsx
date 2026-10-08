@@ -20,6 +20,7 @@ import RequireRole from "@/components/RequireRole";
 import ProgressRing from "@/components/ProgressRing";
 import Skeleton from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { fireConfetti } from "@/lib/confetti";
 import {
   ApiError,
   getEnrolledCourse,
@@ -111,6 +112,7 @@ function LessonView({ slug }: { slug: string }) {
       const justFinished = updated.certificateId && !course?.certificateId;
       setCourse(updated);
       if (justFinished) {
+        fireConfetti();
         toast.success("Tabriklaymiz! Kurs tugallandi va sertifikat berildi 🎉");
       }
       if (goNext && next) select(next.id);
