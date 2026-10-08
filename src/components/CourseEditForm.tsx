@@ -31,7 +31,7 @@ import { youtubeId, youtubeThumbnail } from "@/lib/video";
 type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
 const inputClass =
-  "w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500";
+  "w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition";
 
 const statusInfo: Record<CourseStatus, { text: string; hint: string; className: string }> = {
   ACTIVE: {
@@ -272,7 +272,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
                 type="button"
                 onClick={() => changeStatus("ACTIVE")}
                 disabled={busy}
-                className="text-sm font-medium bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 disabled:opacity-60"
+                className="text-sm font-medium bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 disabled:opacity-60"
               >
                 Nashr qilish
               </button>
@@ -281,7 +281,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
               <>
                 <Link
                   href={`/kurslar/${course.slug}`}
-                  className="flex items-center gap-1.5 text-sm font-medium border border-gray-300 text-gray-700 px-3 py-2 rounded-md hover:border-indigo-400 hover:text-indigo-700"
+                  className="flex items-center gap-1.5 text-sm font-medium border border-gray-300 text-gray-700 px-3 py-2 rounded-xl hover:border-indigo-400 hover:text-indigo-700"
                 >
                   <Eye className="w-4 h-4" />
                   Ko&apos;rish
@@ -290,7 +290,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
                   type="button"
                   onClick={() => changeStatus("HIDDEN")}
                   disabled={busy}
-                  className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 disabled:opacity-60"
+                  className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 disabled:opacity-60"
                 >
                   Yashirish
                 </button>
@@ -301,7 +301,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
                 type="button"
                 onClick={() => changeStatus("DRAFT")}
                 disabled={busy}
-                className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 disabled:opacity-60"
+                className="text-sm font-medium border border-gray-300 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-50 disabled:opacity-60"
               >
                 Qoralamaga qaytarish
               </button>
@@ -405,7 +405,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
         <button
           type="submit"
           disabled={saving}
-          className="w-full bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+          className="w-full bg-indigo-700 text-white font-medium py-3 rounded-xl hover:bg-indigo-800 disabled:opacity-60"
         >
           {saving ? "Saqlanmoqda..." : "O'zgarishlarni saqlash"}
         </button>
@@ -472,10 +472,10 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
                       alt=""
                       width={64}
                       height={36}
-                      className="w-16 h-9 rounded-md object-cover shrink-0 ring-1 ring-gray-200"
+                      className="w-16 h-9 rounded-xl object-cover shrink-0 ring-1 ring-gray-200"
                     />
                   ) : (
-                    <span className="w-16 h-9 rounded-md bg-gray-100 flex items-center justify-center shrink-0">
+                    <span className="w-16 h-9 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
                       <Video className="w-4 h-4 text-gray-400" />
                     </span>
                   )}
@@ -519,7 +519,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
             type="button"
             onClick={addLesson}
             disabled={busy || !newLesson.trim()}
-            className="flex items-center gap-1.5 text-sm font-medium bg-indigo-700 text-white px-4 rounded-md hover:bg-indigo-800 disabled:opacity-60 shrink-0"
+            className="flex items-center gap-1.5 text-sm font-medium bg-indigo-700 text-white px-4 rounded-xl hover:bg-indigo-800 disabled:opacity-60 shrink-0"
           >
             <Plus className="w-4 h-4" />
             Qo&apos;shish
@@ -546,7 +546,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
           type="button"
           onClick={handleDelete}
           disabled={busy}
-          className="mt-3 text-sm font-medium text-red-600 border border-red-300 px-4 py-2 rounded-md hover:bg-red-50 disabled:opacity-60"
+          className="mt-3 text-sm font-medium text-red-600 border border-red-300 px-4 py-2 rounded-xl hover:bg-red-50 disabled:opacity-60"
         >
           Kursni o&apos;chirish
         </button>

@@ -7,11 +7,12 @@ import { Video } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import InstructorNav from "@/components/InstructorNav";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { createCourse, getCategories, ApiError, type ApiCategory } from "@/lib/api";
 
 const inputClass =
-  "w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500";
+  "w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition";
 
 function CreateCourseForm() {
   const router = useRouter();
@@ -61,8 +62,8 @@ function CreateCourseForm() {
   }
 
   return (
-    <section className="max-w-2xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">
+    <section className="max-w-2xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+      <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
         Yangi kurs yaratish
       </h1>
       <p className="text-gray-500 text-sm mb-8">
@@ -70,7 +71,7 @@ function CreateCourseForm() {
         qo&apos;shasiz.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-3xl bg-white ring-1 ring-gray-200 p-5 md:p-8">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Kurs nomi
@@ -158,13 +159,11 @@ function CreateCourseForm() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Video darslar
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-            <Video className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">
-              Video yuklash funksiyasi tez orada qo&apos;shiladi
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Kursni saqlagach, darslar ro&apos;yxatini keyingi sahifada to&apos;ldirasiz
+          <div className="flex items-start gap-3 rounded-2xl bg-indigo-50/60 ring-1 ring-indigo-100 p-4 text-sm text-gray-600">
+            <Video className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+            <p>
+              Kursni saqlagach, keyingi sahifada darslarni qo&apos;shasiz va har biriga <b>YouTube havolasini</b>{" "}
+              qo&apos;yasiz — talabalar videoni saytning o&apos;zida ko&apos;radi.
             </p>
           </div>
         </div>
@@ -172,7 +171,7 @@ function CreateCourseForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-700 text-white font-medium py-3 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+          className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 disabled:opacity-60 transition"
         >
           {loading ? "Saqlanmoqda..." : "Kursni saqlash va davom etish"}
         </button>
@@ -186,6 +185,7 @@ export default function CreateCoursePage() {
     <RequireRole role="INSTRUCTOR">
       <main>
         <Header />
+        <InstructorNav />
         <CreateCourseForm />
         <Footer />
       </main>

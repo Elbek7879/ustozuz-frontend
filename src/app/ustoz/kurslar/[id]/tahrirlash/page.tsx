@@ -1,11 +1,10 @@
 "use client";
 
 import { use } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import InstructorNav from "@/components/InstructorNav";
 import CourseEditForm from "@/components/CourseEditForm";
 
 export default function EditCoursePage({
@@ -19,17 +18,10 @@ export default function EditCoursePage({
     <RequireRole role="INSTRUCTOR">
       <main>
         <Header />
+        <InstructorNav />
 
-        <section className="max-w-2xl mx-auto px-6 py-10">
-          <Link
-            href="/ustoz/panel"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-700 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Ustoz paneli
-          </Link>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">
+        <section className="max-w-2xl mx-auto px-4 sm:px-6 py-8 md:py-10">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">
             Kursni tahrirlash
           </h1>
 
