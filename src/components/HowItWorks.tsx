@@ -1,66 +1,66 @@
 import { Search, PlayCircle, Award } from "lucide-react";
+import SectionHeading from "@/components/SectionHeading";
 
 const steps = [
   {
     icon: Search,
     title: "Kursni tanlang",
     desc: "Kategoriyalar bo'yicha qidiring yoki mashhur kurslar orasidan o'zingizga mosini toping.",
-    bg: "bg-indigo-50",
-    color: "text-indigo-600",
+    color: "from-indigo-500 to-indigo-600",
   },
   {
     icon: PlayCircle,
     title: "O'z sur'atingizda o'rganing",
-    desc: "Darslarni istalgan vaqtda, telefon yoki kompyuterdan ko'ring va amaliy topshiriqlarni bajaring.",
-    bg: "bg-emerald-50",
-    color: "text-emerald-600",
+    desc: "Darslarni istalgan vaqtda telefon yoki kompyuterdan o'ting va progressingizni kuzating.",
+    color: "from-purple-500 to-fuchsia-600",
   },
   {
     icon: Award,
     title: "Sertifikat oling",
-    desc: "Kursni tugatgach, o'zlashtirganingizni tasdiqlovchi sertifikat qo'lga kiriting.",
-    bg: "bg-amber-50",
-    color: "text-amber-600",
+    desc: "Barcha darslarni tugatgach, ismingiz yozilgan sertifikat avtomatik beriladi.",
+    color: "from-amber-400 to-orange-500",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-16">
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-          UstozUz&apos;da o&apos;rganish qanday ishlaydi
-        </h2>
-        <p className="text-gray-500 mt-3">
-          Boshlash uchun atigi uchta oddiy qadam.
-        </p>
-      </div>
+    <section className="bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+        <SectionHeading
+          align="center"
+          eyebrow="Qanday ishlaydi"
+          title="Uch qadamda yangi kasb sari"
+          subtitle="Ro'yxatdan o'tish bir daqiqa oladi — qolgani sizning qiziqishingizga bog'liq"
+        />
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {steps.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <div
-              key={s.title}
-              className="relative border border-gray-200 rounded-2xl p-7 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-            >
-              <span className="absolute top-5 right-6 text-5xl font-bold text-gray-100 select-none">
-                {i + 1}
-              </span>
+        <div className="relative grid md:grid-cols-3 gap-6 md:gap-8">
+          {/* Qadamlarni bog'lovchi chiziq (kompyuterda) */}
+          <div className="hidden md:block absolute top-12 left-[16%] right-[16%] border-t-2 border-dashed border-indigo-200" />
 
+          {steps.map((s, i) => {
+            const Icon = s.icon;
+            return (
               <div
-                className={`w-14 h-14 rounded-xl ${s.bg} flex items-center justify-center mb-5`}
+                key={s.title}
+                className="relative bg-white rounded-3xl p-8 text-center shadow-sm ring-1 ring-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
-                <Icon className={`w-7 h-7 ${s.color}`} />
-              </div>
+                <div className="relative mx-auto w-16 h-16">
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center shadow-lg rotate-3`}
+                  >
+                    <Icon className="w-8 h-8 text-white -rotate-3" />
+                  </div>
+                  <span className="absolute -top-2 -right-3 w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center ring-4 ring-white">
+                    {i + 1}
+                  </span>
+                </div>
 
-              <h3 className="font-semibold text-gray-900 text-lg">{s.title}</h3>
-              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                {s.desc}
-              </p>
-            </div>
-          );
-        })}
+                <h3 className="mt-6 font-bold text-gray-900 text-lg">{s.title}</h3>
+                <p className="text-sm text-gray-500 mt-2 leading-relaxed">{s.desc}</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

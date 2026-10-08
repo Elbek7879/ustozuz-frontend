@@ -31,10 +31,11 @@ const features = [
 
 export default function FeatureBanner() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-10">
-      <div className="bg-gray-900 rounded-3xl overflow-hidden grid md:grid-cols-2 items-center">
+    <section className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <div className="relative bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950 rounded-[2rem] overflow-hidden grid md:grid-cols-2 items-center shadow-xl">
         <div className="p-8 md:p-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-indigo-300">Nega UstozUz</p>
+          <h2 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
             Karyerangizni bugundan boshlab qayta quring
           </h2>
           <p className="mt-4 text-gray-400 text-sm md:text-base">
@@ -43,7 +44,7 @@ export default function FeatureBanner() {
             UstozUz orqali yangi kasb egallamoqda.
           </p>
 
-          <div className="grid grid-cols-2 gap-4 mt-8">
+          <div className="grid sm:grid-cols-2 gap-4 mt-8">
             {features.map((f) => {
               const Icon = f.icon;
               return (
@@ -63,9 +64,9 @@ export default function FeatureBanner() {
 
           <Link
             href="/kurslar"
-            className="inline-block mt-8 bg-white text-gray-900 font-semibold px-6 py-3 rounded-md hover:bg-gray-100 text-sm"
+            className="inline-flex items-center gap-2 mt-8 bg-white text-gray-900 font-semibold px-6 py-3.5 rounded-xl hover:bg-indigo-50 text-sm transition"
           >
-            Batafsil ma&apos;lumot
+            Kurslarni ko&apos;rish
           </Link>
         </div>
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Menu, X, Search, User, LogOut, BookOpen } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
+import Logo from "@/components/Logo";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function Header() {
@@ -30,11 +31,9 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-gray-200/70">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 gap-6">
-        <Link href="/" className="text-2xl font-bold text-indigo-700 shrink-0">
-          Ustoz<span className="text-gray-900">Uz</span>
-        </Link>
+        <Logo />
 
         <form onSubmit={handleSearch} role="search" className="hidden md:flex flex-1 max-w-xl">
           <div className="relative w-full">
@@ -45,25 +44,25 @@ export default function Header() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Kurs, ustoz yoki kategoriya qidiring"
               aria-label="Qidiruv"
-              className="w-full border border-gray-300 rounded-full py-2 pl-10 pr-5 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-gray-100/80 border border-transparent rounded-full py-2.5 pl-10 pr-5 text-sm placeholder:text-gray-500 focus:outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition"
             />
           </div>
         </form>
 
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-gray-700 shrink-0">
-          <Link href="/kategoriyalar" className="hover:text-indigo-700">
+        <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-700 shrink-0">
+          <Link href="/kategoriyalar" className="px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-indigo-700 transition">
             Kategoriyalar
           </Link>
-          <Link href="/ustoz-bolish" className="hover:text-indigo-700">
+          <Link href="/ustoz-bolish" className="px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-indigo-700 transition">
             Ustoz bo&apos;lish
           </Link>
         </nav>
 
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/savat" aria-label="Savat" className="relative p-2 hover:text-indigo-700">
+          <Link href="/savat" aria-label="Savat" className="relative p-2 rounded-lg hover:bg-gray-100 hover:text-indigo-700 transition">
             <ShoppingCart className="w-5 h-5" />
             {items.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-indigo-700 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-white">
                 {items.length}
               </span>
             )}
@@ -79,20 +78,20 @@ export default function Header() {
                 aria-label="Foydalanuvchi menyusi"
                 className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100"
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 text-white text-sm font-semibold flex items-center justify-center ring-2 ring-white shadow-sm">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
               </button>
 
               {userMenuOpen && (
-                <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg w-48 py-2">
-                  <p className="px-4 py-2 text-sm font-medium text-gray-900 truncate border-b border-gray-100">
+                <div className="absolute right-0 top-12 bg-white rounded-2xl shadow-xl ring-1 ring-black/5 w-56 p-2">
+                  <p className="px-3 py-2.5 mb-1 text-sm font-semibold text-gray-900 truncate border-b border-gray-100">
                     {user.name}
                   </p>
                   <Link
                     href={dashboardLink()}
                     onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 rounded-xl hover:bg-gray-50"
                   >
                     <User className="w-4 h-4" />
                     Mening kabinetim
@@ -101,7 +100,7 @@ export default function Header() {
                     <Link
                       href="/talaba/kurslarim"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 rounded-xl hover:bg-gray-50"
                     >
                       <BookOpen className="w-4 h-4" />
                       Sotib olgan kurslarim
@@ -112,7 +111,7 @@ export default function Header() {
                       logout();
                       setUserMenuOpen(false);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-600 rounded-xl hover:bg-red-50 w-full text-left"
                   >
                     <LogOut className="w-4 h-4" />
                     Chiqish
@@ -130,7 +129,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/royxatdan-otish"
-                className="hidden sm:inline-block bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-indigo-800"
+                className="hidden sm:inline-block bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-indigo-800 shadow-sm shadow-indigo-200 transition"
               >
                 Ro&apos;yxatdan o&apos;tish
               </Link>
@@ -175,7 +174,7 @@ export default function Header() {
                 <Link
                   href="/royxatdan-otish"
                   onClick={() => setMenuOpen(false)}
-                  className="bg-indigo-700 text-white text-center px-4 py-2 rounded-md"
+                  className="bg-indigo-700 text-white text-center font-semibold px-4 py-2.5 rounded-xl"
                 >
                   Ro&apos;yxatdan o&apos;tish
                 </Link>

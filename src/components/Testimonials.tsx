@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { Star, Quote } from "lucide-react";
+import SectionHeading from "@/components/SectionHeading";
 
 const reviews = [
   {
@@ -7,92 +9,88 @@ const reviews = [
     course: "Frontend dasturlash: noldan mutaxassisgacha",
     text: "Darslar tushunarli va amaliy topshiriqlarga boy edi. Uch oy ichida birinchi loyihamni yakunlab, ishga topshira oldim.",
     rating: 5,
-    gradient: "from-indigo-500 to-purple-500",
+    photo: "photo-1544005313-94ddf0286df2",
   },
   {
     name: "Bobur Yusupov",
     role: "Marketing mutaxassisi",
     course: "Raqamli marketing va SMM",
-    text: "Nazariya kam, real misollar ko'p. O'rgangan strategiyalarimni shu haftaning o'zida ishda sinab ko'rdim.",
+    text: "Nazariya kam, real misollar ko'p. O'rgangan strategiyalarimni shu haftaning o'zida ishda sinab ko'rdim va natija bo'ldi.",
     rating: 5,
-    gradient: "from-amber-500 to-orange-500",
+    photo: "photo-1507003211169-0a1dd7228f2d",
   },
   {
     name: "Dilfuza Rahimova",
     role: "Talaba",
     course: "Ingliz tili: nutq va grammatika",
     text: "Telefondan istalgan vaqtda o'qish mumkinligi juda qulay. Nutqim sezilarli yaxshilandi, sertifikat ham oldim.",
-    rating: 4,
-    gradient: "from-emerald-500 to-teal-500",
+    rating: 5,
+    photo: "photo-1494790108377-be9c29b29330",
   },
 ];
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2);
-}
-
 export default function Testimonials() {
   return (
-    <section className="bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Talabalarimiz nima deydi
-          </h2>
-          <p className="text-gray-500 mt-3">
-            UstozUz orqali yangi ko&apos;nikma egallaganlarning fikrlari.
-          </p>
-        </div>
+    <section className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <SectionHeading
+        align="center"
+        eyebrow="Fikrlar"
+        title="Talabalarimiz nima deydi"
+        subtitle="UstozUz orqali yangi ko'nikma egallaganlarning haqiqiy tajribasi"
+      />
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {reviews.map((r) => (
-            <div
+      <div className="grid md:grid-cols-3 gap-6">
+        {reviews.map((r, i) => {
+          const featured = i === 1;
+          return (
+            <figure
               key={r.name}
-              className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col"
+              className={`relative rounded-3xl p-7 flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+                featured
+                  ? "bg-gradient-to-br from-indigo-700 to-purple-700 text-white shadow-xl shadow-indigo-200 md:-translate-y-3 md:hover:-translate-y-4"
+                  : "bg-white ring-1 ring-gray-200 hover:shadow-xl"
+              }`}
             >
-              <Quote className="w-8 h-8 text-indigo-200 mb-3" />
+              <Quote className={`w-10 h-10 ${featured ? "text-white/30" : "text-indigo-100"}`} />
 
-              <div className="flex gap-0.5 mb-3">
-                {Array.from({ length: 5 }).map((_, i) => (
+              <div className="flex gap-0.5 mt-4">
+                {Array.from({ length: 5 }).map((_, s) => (
                   <Star
-                    key={i}
-                    className={`w-4 h-4 ${
-                      i < r.rating
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-gray-300"
-                    }`}
+                    key={s}
+                    className={`w-4 h-4 ${s < r.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`}
                   />
                 ))}
               </div>
 
-              <p className="text-sm text-gray-700 leading-relaxed flex-1">
+              <blockquote
+                className={`mt-4 text-[15px] leading-relaxed flex-1 ${featured ? "text-indigo-50" : "text-gray-700"}`}
+              >
                 {r.text}
-              </p>
+              </blockquote>
 
-              <div className="flex items-center gap-3 mt-6 pt-5 border-t border-gray-100">
-                <div
-                  className={`w-11 h-11 rounded-full bg-gradient-to-br ${r.gradient} text-white font-semibold text-sm flex items-center justify-center shrink-0`}
-                >
-                  {initials(r.name)}
-                </div>
+              <figcaption
+                className={`flex items-center gap-3 mt-7 pt-6 border-t ${featured ? "border-white/20" : "border-gray-100"}`}
+              >
+                <Image
+                  src={`https://images.unsplash.com/${r.photo}?w=96&h=96&fit=crop&q=80`}
+                  alt={r.name}
+                  width={48}
+                  height={48}
+                  className={`w-12 h-12 rounded-full object-cover ring-2 ${featured ? "ring-white/40" : "ring-indigo-100"}`}
+                />
                 <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm">
-                    {r.name}
+                  <p className={`font-semibold text-sm ${featured ? "text-white" : "text-gray-900"}`}>{r.name}</p>
+                  <p className={`text-xs ${featured ? "text-indigo-200" : "text-gray-500"}`}>{r.role}</p>
+                  <p
+                    className={`text-xs font-medium mt-0.5 line-clamp-1 ${featured ? "text-white/90" : "text-indigo-700"}`}
+                  >
+                    {r.course}
                   </p>
-                  <p className="text-xs text-gray-500">{r.role}</p>
                 </div>
-              </div>
-
-              <p className="text-xs text-indigo-700 font-medium mt-3 line-clamp-1">
-                {r.course}
-              </p>
-            </div>
-          ))}
-        </div>
+              </figcaption>
+            </figure>
+          );
+        })}
       </div>
     </section>
   );
