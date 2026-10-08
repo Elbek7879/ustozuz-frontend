@@ -28,7 +28,18 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const course = await getCourseBySlug(slug);
-    return { title: course.title, description: course.description };
+    const description = `${course.instructorName} • ${course.lessons.length} ta video dars • ${course.description}`.slice(0, 200);
+    return {
+      title: course.title,
+      description,
+      // Kurs havolasi ulashilganda kurs muqovasi chiqadi
+      openGraph: {
+        title: `${course.title} — UstozUz`,
+        description,
+        images: course.imageUrl ? [{ url: course.imageUrl, alt: course.title }] : undefined,
+      },
+      twitter: { card: "summary_large_image", title: `${course.title} — UstozUz`, description },
+    };
   } catch {
     return { title: "Kurs topilmadi" };
   }
