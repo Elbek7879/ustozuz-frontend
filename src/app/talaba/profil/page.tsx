@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { ApiError, changePassword, updateProfile } from "@/lib/api";
 
 const inputClass =
-  "w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500";
+  "w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition";
 
 const roleLabels = { STUDENT: "Talaba", INSTRUCTOR: "Ustoz", ADMIN: "Admin" } as const;
 
@@ -83,15 +83,15 @@ function ProfileContent() {
   }
 
   return (
-    <section className="max-w-2xl mx-auto px-6 py-10 space-y-10">
+    <section className="max-w-3xl mx-auto px-4 sm:px-6 py-8 md:py-10 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Profil</h1>
-        <p className="text-gray-500 text-sm">Shaxsiy ma&apos;lumotlaringiz va hisob sozlamalari.</p>
+        <h1 className="text-lg md:text-xl font-bold text-gray-900">Profil</h1>
+        <p className="mt-1 text-gray-500 text-sm">Shaxsiy ma&apos;lumotlaringiz va hisob sozlamalari.</p>
       </div>
 
-      <form onSubmit={handleProfileSubmit} className="space-y-5">
+      <form onSubmit={handleProfileSubmit} className="space-y-5 rounded-3xl bg-white ring-1 ring-gray-200 p-6 md:p-8">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-xl font-semibold flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-xl font-semibold flex items-center justify-center">
             {initials(user.name)}
           </div>
           <div>
@@ -128,7 +128,7 @@ function ProfileContent() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Telefon raqam</label>
           <div className="flex">
-            <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-sm text-gray-600">
+            <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 rounded-l-xl bg-gray-50 text-sm text-gray-600">
               +998
             </span>
             <input
@@ -140,7 +140,7 @@ function ProfileContent() {
               pattern="[0-9]{9}"
               maxLength={9}
               placeholder="901234567"
-              className="w-full border border-gray-300 rounded-r-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full border border-gray-300 rounded-r-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition"
             />
           </div>
         </div>
@@ -148,14 +148,14 @@ function ProfileContent() {
         <button
           type="submit"
           disabled={savingProfile}
-          className="bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+          className="bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-800 transition disabled:opacity-60"
         >
           {savingProfile ? "Saqlanmoqda..." : "Saqlash"}
         </button>
       </form>
 
-      <form onSubmit={handlePasswordSubmit} className="space-y-5 border-t border-gray-200 pt-10">
-        <h2 className="font-semibold text-gray-900">Parolni o&apos;zgartirish</h2>
+      <form onSubmit={handlePasswordSubmit} className="space-y-5 rounded-3xl bg-white ring-1 ring-gray-200 p-6 md:p-8">
+        <h2 className="text-lg font-bold text-gray-900">Parolni o&apos;zgartirish</h2>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Joriy parol</label>
@@ -200,7 +200,7 @@ function ProfileContent() {
         <button
           type="submit"
           disabled={savingPassword}
-          className="border border-indigo-700 text-indigo-700 font-medium px-6 py-2.5 rounded-md hover:bg-indigo-50 disabled:opacity-60"
+          className="border border-indigo-600 text-indigo-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-50 disabled:opacity-60 transition"
         >
           {savingPassword ? "Yangilanmoqda..." : "Parolni yangilash"}
         </button>
