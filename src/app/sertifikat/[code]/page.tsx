@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BadgeCheck, ShieldX, Award, BookOpen, CalendarDays, GraduationCap, Hash } from "lucide-react";
+import { BadgeCheck, ShieldX, Award, BookOpen, CalendarDays, GraduationCap, Hash, Download, FileText } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ApiError, verifyCertificate, type ApiPublicCertificate } from "@/lib/api";
@@ -38,7 +38,7 @@ export default async function VerifyCertificatePage({ params }: { params: Promis
       <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50 via-white to-white">
         <div className="pointer-events-none absolute -top-24 right-0 w-96 h-96 rounded-full bg-purple-200/40 blur-3xl" />
 
-        <div className="relative max-w-2xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-16">
           {cert ? (
             <>
               <div className="text-center">
@@ -53,7 +53,35 @@ export default async function VerifyCertificatePage({ params }: { params: Promis
                 </p>
               </div>
 
-              <div className="mt-8 rounded-3xl bg-white ring-1 ring-gray-200 shadow-xl shadow-indigo-100/50 overflow-hidden">
+              {/* Sertifikatning o'zi (serverda chizilgan rasm) */}
+              <div className="mt-8 rounded-2xl overflow-hidden bg-white shadow-2xl shadow-indigo-200/60 ring-1 ring-gray-200 aspect-[2000/1414]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/sertifikat/${code}/rasm`}
+                  alt={`${cert.studentName} — sertifikat`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="mt-4 flex flex-col sm:flex-row justify-center gap-3">
+                <a
+                  href={`/sertifikat/${code}/rasm?yuklab=1`}
+                  download
+                  className="flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700 transition"
+                >
+                  <Download className="w-4 h-4" />
+                  Yuklab olish (PNG)
+                </a>
+                <a
+                  href={`/sertifikat/${code}/pdf`}
+                  download
+                  className="flex items-center justify-center gap-2 ring-1 ring-gray-200 bg-white text-gray-800 font-semibold px-6 py-3 rounded-xl hover:bg-gray-50 transition"
+                >
+                  <FileText className="w-4 h-4" />
+                  PDF yuklab olish
+                </a>
+              </div>
+
+              <div className="mt-8 max-w-2xl mx-auto w-full rounded-3xl bg-white ring-1 ring-gray-200 shadow-xl shadow-indigo-100/50 overflow-hidden">
                 <div className="h-1.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-500" />
                 <div className="p-6 md:p-8">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Sertifikat egasi</p>

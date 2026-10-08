@@ -1,32 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
-import { X, Award, Download, ShieldCheck } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { X, Download, FileText, Link2, ExternalLink, ImageOff } from "lucide-react";
 
 type Props = {
   onClose: () => void;
   studentName: string;
   courseTitle: string;
-  date: string;
-  number?: string;
-  instructorName?: string;
-  verifyCode?: string;
-  sample?: boolean;
+  number: string;
+  // UZ-000001-<imzo>: rasm, PDF va ochiq tekshiruv sahifasi shu kod orqali ochiladi
+  verifyCode: string;
 };
 
-export default function CertificateModal({
-  onClose,
-  studentName,
-  courseTitle,
-  date,
-  number,
-  instructorName,
-  verifyCode,
-  sample = false,
-}: Props) {
-  // QR kod joriy sayt manzilidagi ochiq tekshiruv sahifasiga olib boradi
-  const verifyUrl = verifyCode && typeof window !== "undefined" ? `${window.location.origin}/sertifikat/${verifyCode}` : null;
+// Sertifikat oynasi: serverda chizilgan rasm + PNG/PDF yuklab olish
+export default function CertificateModal({ onClose, studentName, courseTitle, number, verifyCode }: Props) {
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [retry, setRetry] = useState(0);
+  const base = `/sertifikat/${verifyCode}`;
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -40,132 +31,106 @@ export default function CertificateModal({
     };
   }, [onClose]);
 
+  async function copyLink() {
+    const url = `${window.location.origin}${base}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Tekshirish havolasi nusxalandi");
+    } catch {
+      toast.error("Nusxalab bo'lmadi: " + url);
+    }
+  }
+
+  const btn =
+    "flex items-center justify-center gap-2 text-sm font-semibold py-3 px-4 rounded-xl transition whitespace-nowrap";
+
   return (
     <div
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Sertifikat"
-      className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-[100] bg-gray-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
     >
-      <div onClick={(e) => e.stopPropagation()} className="relative w-full max-w-2xl my-auto">
-        <button
-          onClick={onClose}
-          aria-label="Yopish"
-          className="print:hidden absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Sertifikatning o'zi (chop etilganda faqat shu qism chiqadi) */}
-        <div className="print-area rounded-2xl bg-white p-2 shadow-2xl">
-          <div className="relative overflow-hidden rounded-xl border-2 border-indigo-100 px-5 pt-8 pb-12 sm:px-12 sm:py-10 text-center bg-gradient-to-b from-indigo-50/60 via-white to-white">
-            {/* Bezak: yuqori/pastki gradient chiziq va burchak ramkalari */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-500" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r from-fuchsia-500 via-purple-600 to-indigo-600" />
-            <div className="pointer-events-none absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 border-indigo-300 rounded-tl-lg" />
-            <div className="pointer-events-none absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 border-indigo-300 rounded-tr-lg" />
-            <div className="pointer-events-none absolute bottom-4 left-4 w-7 h-7 border-b-2 border-l-2 border-indigo-300 rounded-bl-lg" />
-            <div className="pointer-events-none absolute bottom-4 right-4 w-7 h-7 border-b-2 border-r-2 border-indigo-300 rounded-br-lg" />
-
-            <div className="relative">
-              <div className="flex items-center justify-center gap-2">
-                <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white font-extrabold flex items-center justify-center">
-                  U
-                </span>
-                <span className="text-lg font-extrabold text-gray-900">
-                  Ustoz<span className="text-indigo-600">Uz</span>
-                </span>
-              </div>
-
-              <p className="mt-6 text-[11px] sm:text-xs font-bold tracking-[0.35em] uppercase text-indigo-600">Sertifikat</p>
-              <h2 className="mt-1 text-xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
-                Kursni muvaffaqiyatli tugatgani uchun
-              </h2>
-
-              <p className="mt-6 text-sm text-gray-500">Ushbu sertifikat bilan taqdirlanadi</p>
-              <p className="mt-2 text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-600 bg-clip-text text-transparent">
-                {studentName}
-              </p>
-              <div className="mx-auto mt-3 h-px w-56 max-w-full bg-gradient-to-r from-transparent via-indigo-300 to-transparent" />
-
-              <p className="mt-4 text-sm text-gray-500">kurs nomi</p>
-              <p className="mt-1 text-base sm:text-lg font-bold text-gray-900">&ldquo;{courseTitle}&rdquo;</p>
-
-              <div className="mt-8 grid grid-cols-[1fr_auto_1fr] items-end gap-3 text-left">
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-gray-400">Sana</p>
-                  <p className="text-sm font-semibold text-gray-800">{date}</p>
-                  {instructorName && (
-                    <>
-                      <p className="mt-2 text-[11px] uppercase tracking-wider text-gray-400">Ustoz</p>
-                      <p className="text-sm font-semibold text-gray-800">{instructorName}</p>
-                    </>
-                  )}
-                </div>
-
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 ring-4 ring-amber-100 shadow-lg flex items-center justify-center">
-                  <Award className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                </div>
-
-                <div className="text-right">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-400">{number ? "Raqam" : "Holat"}</p>
-                  <p className="text-sm font-semibold text-gray-800">{number ? `№ ${number}` : "Tasdiqlandi"}</p>
-                  <p className="mt-2 text-[11px] uppercase tracking-wider text-gray-400">Platforma</p>
-                  <p className="text-sm font-semibold text-gray-800">ustozuz.vercel.app</p>
-                </div>
-              </div>
-
-              {verifyUrl && (
-                <div className="mt-6 pt-5 border-t border-dashed border-gray-200 flex items-center gap-4 text-left">
-                  <QRCodeSVG
-                    value={verifyUrl}
-                    size={76}
-                    level="M"
-                    className="shrink-0 rounded-lg bg-white p-1 ring-1 ring-gray-200"
-                  />
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-xs font-bold text-gray-800">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      Haqiqiyligini tekshirish
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-gray-500">
-                      QR kodni telefon kamerasi bilan skanerlang yoki havolani oching:
-                    </p>
-                    <p className="mt-1 text-[11px] font-mono text-indigo-700 break-all">
-                      {verifyUrl.replace(/^https?:\/\//, "")}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-5xl my-auto">
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-300">Sertifikat · № {number}</p>
+            <p className="text-white font-semibold truncate">{courseTitle}</p>
           </div>
+          <button
+            onClick={onClose}
+            aria-label="Yopish"
+            className="shrink-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {sample ? (
-          <p className="text-center text-xs text-white/70 mt-4">
-            Bu — namunaviy ko&apos;rinish. Haqiqiy sertifikat kursni tugatgandan so&apos;ng, sizning ismingiz bilan
-            avtomatik yaratiladi.
-          </p>
-        ) : (
-          <button
-            onClick={() => window.print()}
-            className="print:hidden mt-4 w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition"
+        <div className="relative w-full aspect-[2000/1414] rounded-2xl overflow-hidden bg-white shadow-2xl ring-1 ring-white/10">
+          {state === "loading" && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-indigo-50 to-purple-50">
+              <span className="w-10 h-10 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin" />
+              <p className="text-sm text-gray-500">Sertifikat tayyorlanmoqda…</p>
+            </div>
+          )}
+          {state === "error" ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-50 text-center px-6">
+              <ImageOff className="w-9 h-9 text-gray-300" />
+              <p className="text-sm font-medium text-gray-700">Sertifikat rasmini yuklab bo&apos;lmadi</p>
+              <button
+                onClick={() => {
+                  setRetry((r) => r + 1);
+                  setState("loading");
+                }}
+                className="text-sm font-semibold text-indigo-700 hover:underline">
+                Qayta urinish
+              </button>
+            </div>
+          ) : (
+            // Rasm serverda chiziladi (PNG); next/image optimizatsiyasi shart emas
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`${base}/rasm${retry ? `?r=${retry}` : ""}`}
+              alt={`${studentName} — "${courseTitle}" kursi sertifikati`}
+              onLoad={() => setState("ready")}
+              onError={() => setState("error")}
+              className={`w-full h-full object-contain transition-opacity duration-500 ${state === "ready" ? "opacity-100" : "opacity-0"}`}
+            />
+          )}
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <a
+            href={`${base}/rasm?yuklab=1`}
+            download={`UstozUz-sertifikat-${number}.png`}
+            className={`${btn} col-span-2 sm:col-span-1 bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-900/30`}
           >
             <Download className="w-4 h-4" />
-            Chop etish / PDF saqlash
-          </button>
-        )}
-        {verifyUrl && !sample && (
+            Yuklab olish (PNG)
+          </a>
           <a
-            href={verifyUrl}
+            href={`${base}/pdf`}
+            download={`UstozUz-sertifikat-${number}.pdf`}
+            className={`${btn} bg-white text-gray-900 hover:bg-gray-100`}
+          >
+            <FileText className="w-4 h-4" />
+            PDF
+          </a>
+          <button onClick={copyLink} className={`${btn} bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/20`}>
+            <Link2 className="w-4 h-4" />
+            Havola
+          </button>
+          <a
+            href={base}
             target="_blank"
             rel="noopener noreferrer"
-            className="print:hidden mt-3 block text-center text-sm font-medium text-white/80 hover:text-white"
+            className={`${btn} col-span-2 sm:col-span-1 bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/20`}
           >
-            Tekshirish sahifasini ochish ↗
+            <ExternalLink className="w-4 h-4" />
+            Tekshirish sahifasi
           </a>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -136,9 +136,7 @@ function CertificatesContent() {
           onClose={() => setSelected(null)}
           studentName={selected.studentName}
           courseTitle={selected.courseTitle}
-          date={formatDate(selected.issuedAt)}
           number={selected.number}
-          instructorName={selected.instructorName}
           verifyCode={selected.verifyCode}
         />
       )}
