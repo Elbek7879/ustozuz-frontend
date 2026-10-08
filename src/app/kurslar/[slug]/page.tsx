@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Star,
@@ -17,9 +16,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CourseCard from "@/components/CourseCard";
 import AddToCartButton from "@/components/AddToCartButton";
+import CoursePreview from "@/components/CoursePreview";
 import { getCourseBySlug, getCourses, ApiError } from "@/lib/api";
 import { formatNumber, formatPrice } from "@/lib/format";
-import { coverOf } from "@/lib/images";
 
 export async function generateMetadata({
   params,
@@ -110,22 +109,7 @@ export default async function CourseDetailPage({
             </div>
           </div>
 
-          <div className="relative aspect-video rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
-            <Image
-              src={coverOf(course.imageUrl)}
-              alt={course.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 400px"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
-                <PlayCircle className="w-9 h-9 text-indigo-700" />
-              </span>
-            </div>
-          </div>
+          <CoursePreview imageUrl={course.imageUrl} title={course.title} videoUrl={course.previewVideoUrl} />
         </div>
       </section>
 
@@ -165,6 +149,11 @@ export default async function CourseDetailPage({
                       {i + 1}
                     </span>
                     <p className="flex-1 text-sm text-gray-800">{item}</p>
+                    {i === 0 && course.previewVideoUrl && (
+                      <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        Bepul
+                      </span>
+                    )}
                     <PlayCircle className="w-4 h-4 text-gray-300 shrink-0" />
                   </li>
                 ))}

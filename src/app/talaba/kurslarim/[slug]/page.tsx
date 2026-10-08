@@ -5,6 +5,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { PlayCircle, CheckCircle2, Circle, ArrowLeft, Award, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
+import VideoPlayer from "@/components/VideoPlayer";
 import RequireRole from "@/components/RequireRole";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
@@ -104,17 +105,17 @@ function LessonView({ slug }: { slug: string }) {
 
       <div className="grid lg:grid-cols-[1fr_340px] gap-8">
         <div>
-          <div className="relative aspect-video bg-gray-900 rounded-xl flex items-center justify-center">
-            <div className="text-center px-6">
-              <PlayCircle className="w-16 h-16 text-white/70 mx-auto mb-3" />
-              {current && (
-                <p className="text-white font-medium">
-                  {currentIndex + 1}-dars: {current.title}
-                </p>
-              )}
-              <p className="text-white/60 text-sm mt-1">Video pleyer tez orada qo&apos;shiladi</p>
-            </div>
-          </div>
+          {/* key: dars almashganda pleyer yangidan yuklanadi */}
+          <VideoPlayer
+            key={current?.id ?? "bosh"}
+            url={current?.videoUrl}
+            title={current ? `${currentIndex + 1}-dars: ${current.title}` : course.title}
+          />
+          {current && (
+            <p className="mt-3 text-sm font-semibold text-gray-900">
+              {currentIndex + 1}-dars: {current.title}
+            </p>
+          )}
 
           {current && (
             <div className="flex flex-wrap gap-3 mt-4">
@@ -203,7 +204,15 @@ function LessonView({ slug }: { slug: string }) {
                     onClick={() => setCurrentId(lesson.id)}
                     className="flex-1 min-w-0 text-left"
                   >
-                    <p className="text-xs text-gray-400">{i + 1}-dars</p>
+                    <p className="flex items-center gap-1 text-xs text-gray-400">
+                      {i + 1}-dars
+                      {lesson.videoUrl && (
+                        <>
+                          <span>·</span>
+                          <PlayCircle className="w-3.5 h-3.5 text-indigo-500" /> video
+                        </>
+                      )}
+                    </p>
                     <p className="text-sm font-medium text-gray-900 truncate">{lesson.title}</p>
                   </button>
                 </div>

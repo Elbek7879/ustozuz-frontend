@@ -24,6 +24,8 @@ export type ApiCourseDetail = ApiCourseCard & {
   description: string;
   ratingCount: number;
   lessons: string[];
+  // Birinchi darsning videosi (sotib olishdan oldin bepul ko'rish)
+  previewVideoUrl: string | null;
 };
 
 export type ApiPage<T> = {
@@ -222,18 +224,24 @@ export function getCourseLessons(token: string, courseId: number) {
   return apiFetch<ApiLesson[]>(`/instructor/courses/${courseId}/lessons`, { token });
 }
 
-export function createLesson(token: string, courseId: number, title: string) {
+export function createLesson(token: string, courseId: number, title: string, videoUrl?: string) {
   return apiFetch<ApiLesson>(`/instructor/courses/${courseId}/lessons`, {
     method: "POST",
-    body: { title },
+    body: { title, videoUrl: videoUrl || null },
     token,
   });
 }
 
-export function updateLesson(token: string, courseId: number, lessonId: number, title: string) {
+export function updateLesson(
+  token: string,
+  courseId: number,
+  lessonId: number,
+  title: string,
+  videoUrl: string | null
+) {
   return apiFetch<ApiLesson>(`/instructor/courses/${courseId}/lessons/${lessonId}`, {
     method: "PUT",
-    body: { title },
+    body: { title, videoUrl: videoUrl || null },
     token,
   });
 }

@@ -25,6 +25,7 @@ import {
   type CourseStatus,
 } from "@/lib/api";
 import { coverOf } from "@/lib/images";
+import { youtubeId, youtubeThumbnail } from "@/lib/video";
 
 type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
@@ -69,6 +70,7 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
     imageUrl: "",
   });
   const [newLesson, setNewLesson] = useState("");
+  const [newVideo, setNewVideo] = useState("");
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -164,9 +166,10 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
     if (!token || !newLesson.trim()) return;
     setBusy(true);
     try {
-      const lesson = await createLesson(token, courseId, newLesson.trim());
+      const lesson = await createLesson(token, courseId, newLesson.trim(), newVideo.trim());
       setLessons((prev) => [...prev, lesson]);
       setNewLesson("");
+      setNewVideo("");
     } catch (err) {
       toast.error(errorMessage(err));
     } finally {
@@ -179,9 +182,22 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
     const trimmed = title.trim();
     if (!trimmed || trimmed === lesson.title) return;
     try {
-      const updated = await updateLesson(token, courseId, lesson.id, trimmed);
+      const updated = await updateLesson(token, courseId, lesson.id, trimmed, lesson.videoUrl);
       setLessons((prev) => prev.map((l) => (l.id === lesson.id ? updated : l)));
       toast.success("Dars nomi saqlandi");
+    } catch (err) {
+      toast.error(errorMessage(err));
+    }
+  }
+
+  async function saveVideo(lesson: ApiLesson, value: string) {
+    if (!token) return;
+    const trimmed = value.trim();
+    if (trimmed === (lesson.videoUrl ?? "")) return;
+    try {
+      const updated = await updateLesson(token, courseId, lesson.id, lesson.title, trimmed || null);
+      setLessons((prev) => prev.map((l) => (l.id === lesson.id ? updated : l)));
+      toast.success(trimmed ? "Video saqlandi" : "Video olib tashlandi");
     } catch (err) {
       toast.error(errorMessage(err));
     }
@@ -397,48 +413,77 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
           </p>
         )}
 
-        <div className="space-y-2">
-          {lessons.map((lesson, i) => (
-            <div key={lesson.id} className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
-                {i + 1}
-              </span>
-              <input
-                type="text"
-                defaultValue={lesson.title}
-                onBlur={(e) => renameLesson(lesson, e.target.value)}
-                aria-label="Dars nomi"
-                className={inputClass}
-              />
-              <button
-                type="button"
-                onClick={() => moveLesson(i, -1)}
-                disabled={i === 0 || busy}
-                aria-label="Yuqoriga"
-                className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
-              >
-                <ArrowUp className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => moveLesson(i, 1)}
-                disabled={i === lessons.length - 1 || busy}
-                aria-label="Pastga"
-                className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
-              >
-                <ArrowDown className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => removeLesson(lesson)}
-                disabled={busy}
-                aria-label="O'chirish"
-                className="p-1.5 text-gray-400 hover:text-red-600 disabled:opacity-30"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+        <div className="space-y-3">
+          {lessons.map((lesson, i) => {
+            const videoId = youtubeId(lesson.videoUrl);
+            return (
+              <div key={lesson.id} className="rounded-2xl ring-1 ring-gray-200 bg-white p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
+                    {i + 1}
+                  </span>
+                  <input
+                    type="text"
+                    defaultValue={lesson.title}
+                    onBlur={(e) => renameLesson(lesson, e.target.value)}
+                    aria-label="Dars nomi"
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => moveLesson(i, -1)}
+                    disabled={i === 0 || busy}
+                    aria-label="Yuqoriga"
+                    className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveLesson(i, 1)}
+                    disabled={i === lessons.length - 1 || busy}
+                    aria-label="Pastga"
+                    className="p-1.5 text-gray-400 hover:text-indigo-700 disabled:opacity-30 disabled:hover:text-gray-400"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeLesson(lesson)}
+                    disabled={busy}
+                    aria-label="O'chirish"
+                    className="p-1.5 text-gray-400 hover:text-red-600 disabled:opacity-30"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 sm:pl-9">
+                  {videoId ? (
+                    <Image
+                      src={youtubeThumbnail(videoId)}
+                      alt=""
+                      width={64}
+                      height={36}
+                      className="w-16 h-9 rounded-md object-cover shrink-0 ring-1 ring-gray-200"
+                    />
+                  ) : (
+                    <span className="w-16 h-9 rounded-md bg-gray-100 flex items-center justify-center shrink-0">
+                      <Video className="w-4 h-4 text-gray-400" />
+                    </span>
+                  )}
+                  <input
+                    type="url"
+                    defaultValue={lesson.videoUrl ?? ""}
+                    onBlur={(e) => saveVideo(lesson, e.target.value)}
+                    placeholder="YouTube havolasi: https://youtu.be/..."
+                    aria-label="Dars videosi (YouTube havolasi)"
+                    className={`${inputClass} text-xs py-2`}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex gap-2">
@@ -455,6 +500,14 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
             placeholder="Yangi dars nomi"
             className={inputClass}
           />
+          <input
+            type="url"
+            value={newVideo}
+            onChange={(e) => setNewVideo(e.target.value)}
+            placeholder="YouTube havolasi (ixtiyoriy)"
+            aria-label="Yangi dars videosi"
+            className={`${inputClass} hidden sm:block`}
+          />
           <button
             type="button"
             onClick={addLesson}
@@ -466,10 +519,12 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
           </button>
         </div>
 
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
-          <Video className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">
-            Darslarga video biriktirish tez orada qo&apos;shiladi
+        <div className="flex items-start gap-3 rounded-2xl bg-indigo-50/60 ring-1 ring-indigo-100 p-4 text-sm text-gray-600">
+          <Video className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+          <p>
+            Videoni YouTube&apos;ga <b>Unlisted</b> (ro&apos;yxatda yo&apos;q) qilib yuklang va havolasini dars ostiga
+            qo&apos;ying — talabalar uni saytning o&apos;zida ko&apos;radi. <b>Birinchi darsning videosi</b> kurs
+            sahifasida hamma uchun bepul ko&apos;rsatiladi.
           </p>
         </div>
       </div>
