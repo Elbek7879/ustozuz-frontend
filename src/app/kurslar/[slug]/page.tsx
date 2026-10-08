@@ -1,13 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
+import { notFound } from "next/navigation";
+import {
+  Star,
+  Users,
+  Clock,
+  Award,
+  CheckCircle2,
+  ChevronRight,
+  PlayCircle,
+  BookOpen,
+  Smartphone,
+  Infinity as InfinityIcon,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Star, Users, Clock, Award, CheckCircle2 } from "lucide-react";
-import { notFound } from "next/navigation";
-import { getCourseBySlug, getCourses, ApiError } from "@/lib/api";
-import { formatPrice } from "@/lib/format";
-import { coverOf } from "@/lib/images";
+import CourseCard from "@/components/CourseCard";
 import AddToCartButton from "@/components/AddToCartButton";
+import { getCourseBySlug, getCourses, ApiError } from "@/lib/api";
+import { formatNumber, formatPrice } from "@/lib/format";
+import { coverOf } from "@/lib/images";
 
 export async function generateMetadata({
   params,
@@ -23,6 +35,13 @@ export async function generateMetadata({
   }
 }
 
+const includes = [
+  { icon: Clock, text: "O'zingizga qulay sur'atda" },
+  { icon: InfinityIcon, text: "Muddatsiz kirish huquqi" },
+  { icon: Smartphone, text: "Telefon va kompyuterdan" },
+  { icon: Award, text: "Tugatgach sertifikat" },
+];
+
 export default async function CourseDetailPage({
   params,
 }: {
@@ -34,148 +53,149 @@ export default async function CourseDetailPage({
     throw err;
   });
 
-  const allCourses = await getCourses({ category: course.category });
-  const related = allCourses.items
-    .filter((c) => c.slug !== course.slug)
-    .slice(0, 3);
+  const sameCategory = await getCourses({ category: course.category, size: 8 });
+  const related = sameCategory.items.filter((c) => c.slug !== course.slug).slice(0, 4);
 
   return (
     <main>
       <Header />
 
-      <section className="bg-gray-900">
-        <div className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-[1fr_380px] gap-10">
+      <section className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-indigo-950">
+        <div className="pointer-events-none absolute -top-32 right-0 w-[30rem] h-[30rem] rounded-full bg-indigo-600/20 blur-3xl" />
+
+        <div className="relative max-w-7xl mx-auto px-6 py-10 md:py-14 grid lg:grid-cols-[1fr_400px] gap-10 items-center">
           <div>
-            <span className="text-indigo-400 text-sm font-medium">
-              {course.category}
-            </span>
-            <h1 className="text-2xl md:text-3xl font-bold text-white mt-2 leading-tight">
+            <nav className="flex items-center gap-1.5 text-sm text-gray-400" aria-label="Yo'l">
+              <Link href="/kurslar" className="hover:text-white">Kurslar</Link>
+              <ChevronRight className="w-4 h-4" />
+              <Link
+                href={`/kurslar?kategoriya=${encodeURIComponent(course.category)}`}
+                className="text-indigo-300 hover:text-white"
+              >
+                {course.category}
+              </Link>
+            </nav>
+
+            <h1 className="mt-4 text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
               {course.title}
             </h1>
-            <p className="text-gray-300 text-sm mt-3">
-              {course.category} sohasida amaliy va nazariy bilimlarni
-              chuqur o&apos;rganing.
-            </p>
+            <p className="mt-4 text-gray-300 text-base md:text-lg max-w-2xl line-clamp-3">{course.description}</p>
 
-            <div className="flex items-center gap-4 mt-4 text-sm">
-              <span className="flex items-center gap-1 text-amber-400 font-semibold">
-                <Star className="w-4 h-4 fill-amber-400" />
-                {course.rating}
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+              {course.rating > 0 && (
+                <span className="flex items-center gap-1.5 font-semibold text-amber-400">
+                  <Star className="w-4 h-4 fill-amber-400" />
+                  {course.rating.toFixed(1)}
+                  <span className="font-normal text-gray-400">({formatNumber(course.ratingCount)} baho)</span>
+                </span>
+              )}
+              <span className="flex items-center gap-1.5 text-gray-300">
+                <Users className="w-4 h-4" />
+                {formatNumber(course.studentsCount)} talaba
               </span>
-              <span className="text-gray-400">
-                ({course.studentsCount} talaba)
+              <span className="flex items-center gap-1.5 text-gray-300">
+                <BookOpen className="w-4 h-4" />
+                {course.lessons.length} ta dars
               </span>
             </div>
 
-            <p className="text-gray-400 text-sm mt-3">
-              Muallif: <span className="text-white">{course.instructorName}</span>
-            </p>
+            <div className="mt-6 flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold flex items-center justify-center">
+                {course.instructorName.charAt(0)}
+              </div>
+              <div className="text-sm">
+                <p className="text-gray-400">Ustoz</p>
+                <p className="font-semibold text-white">{course.instructorName}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="relative h-56 rounded-xl overflow-hidden self-start">
+          <div className="relative aspect-video rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
             <Image
               src={coverOf(course.imageUrl)}
               alt={course.title}
               fill
-              sizes="380px"
+              priority
+              sizes="(max-width: 1024px) 100vw, 400px"
               className="object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
+                <PlayCircle className="w-9 h-9 text-indigo-700" />
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-[1fr_380px] gap-10">
-        <div>
-          <div className="border border-gray-200 rounded-xl p-6 mb-8">
-            <h2 className="font-semibold text-gray-900 mb-4">
-              Kurs dasturi
-            </h2>
-            {course.lessons.length === 0 && (
-              <p className="text-sm text-gray-500">Darslar tez orada qo&apos;shiladi.</p>
-            )}
-            <div className="space-y-3">
-              {course.lessons.map((item, i) => (
-                <div key={`${i}-${item}`} className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
-                    {i + 1}
-                  </span>
-                  <p className="text-sm text-gray-700">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="border border-gray-200 rounded-xl p-6">
-            <h2 className="font-semibold text-gray-900 mb-3">
-              Kurs haqida
-            </h2>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {course.description}
-            </p>
-          </div>
-        </div>
-
+      <section className="max-w-7xl mx-auto px-6 py-10 md:py-14 grid lg:grid-cols-[1fr_380px] gap-8 lg:gap-10 items-start">
         {/* Telefonda xarid bloki birinchi chiqadi, kompyuterda o'ng tomonda yopishib turadi */}
-        <div className="order-first md:order-none border border-gray-200 rounded-xl p-6 h-fit md:sticky md:top-20">
-          <p className="text-2xl font-bold text-gray-900">
-            {formatPrice(course.price)}
-          </p>
-
+        <aside className="order-first lg:order-none lg:col-start-2 lg:row-start-1 bg-white rounded-3xl ring-1 ring-gray-200 shadow-lg shadow-gray-100 p-6 lg:sticky lg:top-24">
+          <p className="text-3xl font-extrabold text-gray-900">{formatPrice(course.price)}</p>
           <AddToCartButton course={course} />
 
-          <div className="mt-5 space-y-3 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span>O&apos;zingizga qulay sur&apos;atda</span>
+          <p className="mt-6 text-sm font-semibold text-gray-900">Kursga nimalar kiradi</p>
+          <ul className="mt-3 space-y-3 text-sm text-gray-600">
+            {includes.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-indigo-600" />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div className="lg:col-start-1 lg:row-start-1 space-y-6">
+          <div className="bg-white rounded-3xl ring-1 ring-gray-200 p-6 md:p-8">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl font-bold text-gray-900">Kurs dasturi</h2>
+              <span className="text-sm text-gray-500">{course.lessons.length} ta dars</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-gray-400" />
-              <span>Tugatish sertifikati</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-gray-400" />
-              <span>{course.studentsCount} talaba ro&apos;yxatdan o&apos;tgan</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-gray-400" />
-              <span>To&apos;liq kirish huquqi</span>
+
+            {course.lessons.length === 0 ? (
+              <p className="mt-4 text-sm text-gray-500">Darslar tez orada qo&apos;shiladi.</p>
+            ) : (
+              <ol className="mt-5 divide-y divide-gray-100 rounded-2xl ring-1 ring-gray-100 overflow-hidden">
+                {course.lessons.map((item, i) => (
+                  <li key={`${i}-${item}`} className="flex items-center gap-4 px-4 py-3.5 bg-white hover:bg-gray-50">
+                    <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center shrink-0">
+                      {i + 1}
+                    </span>
+                    <p className="flex-1 text-sm text-gray-800">{item}</p>
+                    <PlayCircle className="w-4 h-4 text-gray-300 shrink-0" />
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+
+          <div className="bg-white rounded-3xl ring-1 ring-gray-200 p-6 md:p-8">
+            <h2 className="text-xl font-bold text-gray-900">Kurs haqida</h2>
+            <p className="mt-3 text-gray-600 leading-relaxed whitespace-pre-line">{course.description}</p>
+            <div className="mt-6 grid sm:grid-cols-2 gap-3">
+              {["Amaliy topshiriqlar", "Bosqichma-bosqich dastur", "Tajribali ustoz", "Sertifikat bilan yakun"].map((t) => (
+                <p key={t} className="flex items-center gap-2 text-sm text-gray-700">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                  {t}
+                </p>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {related.length > 0 && (
-        <section className="max-w-7xl mx-auto px-6 pb-16">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">
-            O&apos;xshash kurslar
-          </h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {related.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/kurslar/${c.slug}`}
-                className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition block"
-              >
-                <div className="relative h-32">
-                  <Image
-                    src={coverOf(c.imageUrl)}
-                    alt={c.title}
-                    fill
-                    sizes="300px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
-                    {c.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-1">{c.instructorName}</p>
-                  <p className="font-bold text-gray-900 mt-2">
-                    {formatPrice(c.price)}
-                  </p>
-                </div>
-              </Link>
-            ))}
+        <section className="bg-gray-50">
+          <div className="max-w-7xl mx-auto px-6 py-14">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-8">O&apos;xshash kurslar</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              {related.map((c) => (
+                <CourseCard key={c.slug} course={c} />
+              ))}
+            </div>
           </div>
         </section>
       )}
