@@ -7,6 +7,7 @@ import { Users, BookOpen, Wallet, Star, ArrowRight, UserPlus, BookPlus, Mail } f
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import Skeleton from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   getAdminStats,
@@ -88,7 +89,11 @@ function AdminDashboard() {
       </p>
 
       {!stats ? (
-        <p className="text-gray-400 mb-10">Yuklanmoqda...</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+          {Array.from({ length: 4 }, (_, i) => (
+            <Skeleton key={i} className="h-28 rounded-2xl" />
+          ))}
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
           {cards.map((s) => {

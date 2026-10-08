@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
 import type { ApiUser } from "@/lib/api";
+import { Spinner } from "@/components/Skeleton";
 
 type Role = ApiUser["role"];
 
@@ -35,9 +36,7 @@ export default function RequireRole({
 
   if (loading || !allowed) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center text-gray-400">
-        Yuklanmoqda...
-      </div>
+      <Spinner />
     );
   }
 

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import Skeleton from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getInstructorCourses, type ApiInstructorCourse } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
@@ -78,7 +79,11 @@ function InstructorPanelContent() {
         </h2>
 
         {courses === null ? (
-          <p className="text-gray-400">Yuklanmoqda...</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }, (_, i) => (
+              <Skeleton key={i} className="h-64 rounded-2xl" />
+            ))}
+          </div>
         ) : courses.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-gray-300 rounded-xl">
             <p className="text-gray-500 mb-4">Siz hali kurs yaratmagansiz.</p>

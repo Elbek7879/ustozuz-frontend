@@ -1,15 +1,15 @@
 import { BookOpen, GraduationCap, Star, Users } from "lucide-react";
 import { getPublicStats } from "@/lib/api";
-import { formatNumber } from "@/lib/format";
+import CountUp from "@/components/CountUp";
 
 export default async function Stats() {
   const stats = await getPublicStats();
 
   const items = [
-    { value: `${formatNumber(stats.totalStudents)}+`, label: "Talabalar", icon: Users },
-    { value: `${formatNumber(stats.totalCourses)}+`, label: "Amaliy kurslar", icon: BookOpen },
-    { value: `${formatNumber(stats.totalInstructors)}+`, label: "Tajribali ustozlar", icon: GraduationCap },
-    { value: stats.avgRating.toFixed(1), label: "O'rtacha reyting", icon: Star },
+    { value: <CountUp value={stats.totalStudents} suffix="+" />, label: "Talabalar", icon: Users },
+    { value: <CountUp value={stats.totalCourses} suffix="+" />, label: "Amaliy kurslar", icon: BookOpen },
+    { value: <CountUp value={stats.totalInstructors} suffix="+" />, label: "Tajribali ustozlar", icon: GraduationCap },
+    { value: <CountUp value={stats.avgRating} decimals={1} />, label: "O'rtacha reyting", icon: Star },
   ];
 
   return (

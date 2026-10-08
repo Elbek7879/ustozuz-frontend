@@ -22,7 +22,7 @@ export default async function Hero() {
       <div className="pointer-events-none absolute top-20 right-0 w-96 h-96 rounded-full bg-purple-200/40 blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-16 md:pt-16 md:pb-24 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
-        <div>
+        <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-700 bg-indigo-100/80 px-3 py-1.5 rounded-full">
             <Sparkles className="w-3.5 h-3.5" />
             O&apos;zbek tilidagi onlayn ta&apos;lim platformasi
@@ -83,7 +83,7 @@ export default async function Hero() {
         </div>
 
         {/* O'ng tomon: rasm va ustida suzib turgan kartochkalar */}
-        <div className="relative hidden lg:block">
+        <div className="relative hidden lg:block animate-fade-up [animation-delay:200ms]">
           <div className="absolute inset-6 rounded-[2.5rem] bg-gradient-to-br from-indigo-500 to-purple-600 rotate-3" />
           <div className="relative aspect-[4/5] max-h-[520px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
             <Image

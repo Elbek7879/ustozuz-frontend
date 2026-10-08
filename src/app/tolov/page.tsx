@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CreditCard, Smartphone, Lock } from "lucide-react";
 import Header from "@/components/Header";
+import { Spinner } from "@/components/Skeleton";
 import Footer from "@/components/Footer";
 import { useCart } from "@/lib/cart/CartContext";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
     return (
       <main>
         <Header />
-        <p className="max-w-xl mx-auto px-6 py-24 text-center text-gray-400">Yuklanmoqda...</p>
+        <Spinner />
       </main>
     );
   }

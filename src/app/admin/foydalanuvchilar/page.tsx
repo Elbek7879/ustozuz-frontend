@@ -7,6 +7,7 @@ import { ArrowLeft, Ban, CheckCircle2, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import Skeleton from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   ApiError,
@@ -100,7 +101,11 @@ function UsersTable() {
       </div>
 
       {users === null ? (
-        <p className="text-gray-400">Yuklanmoqda...</p>
+        <div className="space-y-2">
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} className="h-12" />
+          ))}
+        </div>
       ) : (
         <div className="border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
           <table className="w-full text-sm">

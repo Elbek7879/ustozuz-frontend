@@ -25,6 +25,7 @@ import {
   type CourseStatus,
 } from "@/lib/api";
 import { coverOf } from "@/lib/images";
+import Skeleton from "@/components/Skeleton";
 import { youtubeId, youtubeThumbnail } from "@/lib/video";
 
 type FieldElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -114,7 +115,13 @@ export default function CourseEditForm({ courseId }: { courseId: number }) {
   }
 
   if (!course || !token) {
-    return <p className="text-gray-400">Yuklanmoqda...</p>;
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-2/3" />
+        <Skeleton className="h-40" />
+        <Skeleton className="h-64" />
+      </div>
+    );
   }
 
   const status = statusInfo[course.status];

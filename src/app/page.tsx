@@ -10,21 +10,40 @@ import PopularSkills from "@/components/PopularSkills";
 import FAQ from "@/components/FAQ";
 import CallToAction from "@/components/CallToAction";
 import Footer from "@/components/Footer";
+import Reveal from "@/components/Reveal";
 
 export default function Home() {
   return (
     <main>
       <Header />
       <Hero />
-      <Categories />
-      <Courses />
-      <HowItWorks />
-      <FeatureBanner />
-      <Stats />
-      <Testimonials />
-      <PopularSkills />
-      <FAQ />
-      <CallToAction />
+      <Reveal>
+        <Categories />
+      </Reveal>
+      <Reveal>
+        <Courses />
+      </Reveal>
+      <Reveal>
+        <HowItWorks />
+      </Reveal>
+      <Reveal>
+        <FeatureBanner />
+      </Reveal>
+      <Reveal>
+        <Stats />
+      </Reveal>
+      <Reveal>
+        <Testimonials />
+      </Reveal>
+      <Reveal>
+        <PopularSkills />
+      </Reveal>
+      <Reveal>
+        <FAQ />
+      </Reveal>
+      <Reveal>
+        <CallToAction />
+      </Reveal>
       <Footer />
     </main>
   );
