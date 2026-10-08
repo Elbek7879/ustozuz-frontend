@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import toast from "react-hot-toast";
-import { ArrowLeft, Ban, CheckCircle2, Search } from "lucide-react";
+import { Ban, CheckCircle2, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RequireRole from "@/components/RequireRole";
+import AdminNav from "@/components/AdminNav";
 import Skeleton from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
@@ -75,17 +75,9 @@ function UsersTable() {
     users?.filter((u) => !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) ?? [];
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-10">
-      <Link
-        href="/admin"
-        className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-700 mb-4"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Admin panel
-      </Link>
-
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Foydalanuvchilar</h1>
+        <h1 className="text-lg md:text-xl font-bold text-gray-900">Foydalanuvchilar</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -107,7 +99,7 @@ function UsersTable() {
           ))}
         </div>
       ) : (
-        <div className="border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
+        <div className="rounded-2xl bg-white ring-1 ring-gray-200 overflow-hidden overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left text-gray-500">
               <tr>
@@ -193,6 +185,7 @@ export default function UsersPage() {
     <RequireRole role="ADMIN">
       <main>
         <Header />
+        <AdminNav />
         <UsersTable />
         <Footer />
       </main>

@@ -102,6 +102,20 @@ body > main > footer {
   animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Grafik ustunlari chapdan o'sib chiqadi */
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-grow {
+  animation: grow 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Reveal: bo'lim ekranga kirib kelganda paydo bo'ladi */
 .reveal {
   transition:
@@ -115,7 +129,8 @@ body > main > footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up {
+  .animate-fade-up,
+  .animate-grow {
     animation: none;
   }
 }
