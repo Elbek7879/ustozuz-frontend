@@ -64,7 +64,7 @@ export default function RegisterPage() {
             required
             autoComplete="name"
             className={authInputClass}
-            placeholder="Elbek Aliyev"
+            placeholder="Elbek Abduraximov"
           />
         </div>
 
