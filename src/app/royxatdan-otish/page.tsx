@@ -1,18 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import Header from "@/components/Header";
+import AuthShell, { authButtonClass, authInputClass } from "@/components/AuthShell";
+import PasswordInput from "@/components/PasswordInput";
 import { useAuth, ApiError } from "@/lib/auth/AuthContext";
 import { nextPath } from "@/lib/auth/redirect";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, user, loading: authLoading } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  // ?next=... ikkinchi sahifaga ham o'tsin (masalan to'lovdan kelganda)
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setQuery(window.location.search);
+  }, []);
+
+  // Tizimga kirgan foydalanuvchi bu sahifada qolmaydi (ro'yxatdan o'tgach ham shu yerdan yo'naltiriladi)
+  useEffect(() => {
+    if (!authLoading && user) router.replace(nextPath());
+  }, [authLoading, user, router]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,90 +36,95 @@ export default function RegisterPage() {
     try {
       await register(form.name, form.email, form.password);
       toast.success("Ro'yxatdan muvaffaqiyatli o'tdingiz");
-      router.push(nextPath());
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Xatolik yuz berdi";
       toast.error(message);
-    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main>
-      <Header />
+    <AuthShell>
+      <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Hisob yarating</h1>
+      <p className="text-gray-500 mt-2 mb-8">
+        Bepul ro&apos;yxatdan o&apos;ting va bugunoq o&apos;rganishni boshlang
+      </p>
 
-      <section className="max-w-md mx-auto px-6 py-16">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Ro&apos;yxatdan o&apos;tish
-        </h1>
-        <p className="text-gray-500 text-sm mb-8">
-          UstozUz&apos;da bugunoq o&apos;rganishni boshlang
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
+            Ism va familiya
+          </label>
+          <input
+            id="name"
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            autoComplete="name"
+            className={authInputClass}
+            placeholder="Elbek Aliyev"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+            Elektron pochta
+          </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            autoComplete="email"
+            autoCapitalize="none"
+            className={authInputClass}
+            placeholder="email@misol.uz"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+            Parol
+          </label>
+          <PasswordInput
+            id="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            minLength={6}
+            autoComplete="new-password"
+            placeholder="Kamida 6 ta belgi"
+          />
+        </div>
+
+        <button type="submit" disabled={loading} className={authButtonClass}>
+          {loading ? "Yuborilmoqda..." : "Ro'yxatdan o'tish"}
+        </button>
+
+        <p className="text-xs text-gray-400 text-center">
+          Ro&apos;yxatdan o&apos;tish orqali{" "}
+          <Link href="/shartlar" className="underline hover:text-gray-600">
+            foydalanish shartlari
+          </Link>{" "}
+          va{" "}
+          <Link href="/maxfiylik" className="underline hover:text-gray-600">
+            maxfiylik siyosatiga
+          </Link>{" "}
+          rozilik bildirasiz.
         </p>
+      </form>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Ism va familiya
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
-              placeholder="Elbek Aliyev"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Elektron pochta
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
-              placeholder="email@misol.uz"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Parol
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
-              placeholder="Kamida 6 ta belgi"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800 disabled:opacity-60"
-          >
-            {loading ? "Yuborilmoqda..." : "Ro'yxatdan o'tish"}
-          </button>
-        </form>
-
-        <p className="text-sm text-gray-500 mt-6 text-center">
-          Allaqachon hisobingiz bormi?{" "}
-          <Link href="/kirish" className="text-indigo-700 font-medium hover:underline">
-            Tizimga kiring
-          </Link>
-        </p>
-      </section>
-    </main>
+      <p className="text-sm text-gray-500 mt-8 text-center">
+        Allaqachon hisobingiz bormi?{" "}
+        <Link href={`/kirish${query}`} className="text-indigo-700 font-semibold hover:underline">
+          Tizimga kiring
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

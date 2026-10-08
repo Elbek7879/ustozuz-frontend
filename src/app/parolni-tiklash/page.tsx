@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { ArrowLeft, Mail, KeyRound } from "lucide-react";
-import Header from "@/components/Header";
+import AuthShell, { authButtonClass, authInputClass } from "@/components/AuthShell";
 import { forgotPasswordRequest, ApiError } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
@@ -28,17 +28,14 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main>
-      <Header />
-
-      <section className="max-w-md mx-auto px-6 py-16">
+    <AuthShell>
         {!sent ? (
           <>
             <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mb-6">
               <KeyRound className="w-7 h-7 text-indigo-600" />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
               Parolni tiklash
             </h1>
             <p className="text-gray-500 text-sm mb-8">
@@ -57,14 +54,14 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="email@misol.uz"
-                  className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+                  className={authInputClass}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+                className={authButtonClass}
               >
                 {loading ? "Yuborilmoqda..." : "Havola yuborish"}
               </button>
@@ -76,7 +73,7 @@ export default function ForgotPasswordPage() {
               <Mail className="w-8 h-8 text-emerald-600" />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
               Pochtangizni tekshiring
             </h1>
             <p className="text-gray-500 text-sm">
@@ -105,7 +102,6 @@ export default function ForgotPasswordPage() {
           <ArrowLeft className="w-4 h-4" />
           Kirish sahifasiga qaytish
         </Link>
-      </section>
-    </main>
+    </AuthShell>
   );
 }

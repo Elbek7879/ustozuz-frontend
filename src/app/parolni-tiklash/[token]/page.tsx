@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { KeyRound } from "lucide-react";
-import Header from "@/components/Header";
+import AuthShell, { authButtonClass } from "@/components/AuthShell";
+import PasswordInput from "@/components/PasswordInput";
 import { resetPasswordRequest, ApiError } from "@/lib/api";
 
 export default function ResetPasswordPage({
@@ -40,15 +41,12 @@ export default function ResetPasswordPage({
   }
 
   return (
-    <main>
-      <Header />
-
-      <section className="max-w-md mx-auto px-6 py-16">
+    <AuthShell>
         <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mb-6">
           <KeyRound className="w-7 h-7 text-indigo-600" />
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
           Yangi parol o&apos;rnating
         </h1>
         <p className="text-gray-500 text-sm mb-8">
@@ -60,13 +58,11 @@ export default function ResetPasswordPage({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Yangi parol
             </label>
-            <input
-              type="password"
+            <PasswordInput
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
               minLength={6}
-              className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
               placeholder="Kamida 6 ta belgi"
             />
           </div>
@@ -75,25 +71,22 @@ export default function ResetPasswordPage({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Yangi parolni takrorlang
             </label>
-            <input
-              type="password"
+            <PasswordInput
               value={form.confirm}
               onChange={(e) => setForm({ ...form, confirm: e.target.value })}
               required
               minLength={6}
-              className="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-700 text-white font-medium py-2.5 rounded-md hover:bg-indigo-800 disabled:opacity-60"
+            className={authButtonClass}
           >
             {loading ? "Yangilanmoqda..." : "Parolni yangilash"}
           </button>
         </form>
-      </section>
-    </main>
+    </AuthShell>
   );
 }
