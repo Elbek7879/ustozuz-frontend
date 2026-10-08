@@ -29,7 +29,7 @@ export default function HeroSearch() {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Nimani o'rganmoqchisiz?"
+          placeholder="Masalan: Python"
           aria-label="Kurs qidirish"
           className="flex-1 min-w-0 py-2.5 text-[15px] bg-transparent focus:outline-none placeholder:text-gray-400"
         />

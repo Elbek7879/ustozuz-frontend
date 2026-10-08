@@ -21,14 +21,14 @@ export default async function Hero() {
       <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-indigo-200/40 blur-3xl" />
       <div className="pointer-events-none absolute top-20 right-0 w-96 h-96 rounded-full bg-purple-200/40 blur-3xl" />
 
-      <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-16 md:pt-16 md:pb-24 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
+      <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-16 md:pt-16 md:pb-24 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
         <div>
           <span className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-700 bg-indigo-100/80 px-3 py-1.5 rounded-full">
             <Sparkles className="w-3.5 h-3.5" />
             O&apos;zbek tilidagi onlayn ta&apos;lim platformasi
           </span>
 
-          <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1]">
+          <h1 className="mt-5 text-[2rem] sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1]">
             O&apos;zbekistondagi eng yaxshi{" "}
             <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               ustozlardan
@@ -45,7 +45,7 @@ export default async function Hero() {
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex -space-x-3">
+              <div className="flex -space-x-3 shrink-0">
                 {avatars.map((src) => (
                   <Image
                     key={src}

@@ -12,7 +12,7 @@ const styles = {
     add: "bg-indigo-700 text-white hover:bg-indigo-800",
   },
   card: {
-    base: "w-full flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-md transition",
+    base: "w-full flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium py-2 rounded-lg whitespace-nowrap transition",
     add: "border border-indigo-700 text-indigo-700 hover:bg-indigo-50",
   },
 };

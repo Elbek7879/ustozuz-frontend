@@ -32,13 +32,13 @@ export default function CourseCard({ course }: { course: ApiCourseCard }) {
           </span>
         </div>
 
-        <div className="flex-1 flex flex-col p-4 pb-0">
+        <div className="flex-1 flex flex-col p-3 sm:p-4 pb-0 sm:pb-0">
           <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-indigo-700 transition-colors">
             {course.title}
           </h3>
           <p className="text-xs text-gray-500 mt-1 truncate">{course.instructorName}</p>
 
-          <div className="flex items-center gap-3 mt-2 text-xs">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs">
             {course.rating > 0 ? (
               <span className="flex items-center gap-1 font-semibold text-amber-600">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -49,7 +49,7 @@ export default function CourseCard({ course }: { course: ApiCourseCard }) {
                 Yangi
               </span>
             )}
-            <span className="flex items-center gap-1 text-gray-500">
+            <span className="flex items-center gap-1 text-gray-500 whitespace-nowrap">
               <Users className="w-3.5 h-3.5" />
               {formatNumber(course.studentsCount)} talaba
             </span>
@@ -59,7 +59,7 @@ export default function CourseCard({ course }: { course: ApiCourseCard }) {
         </div>
       </Link>
 
-      <div className="p-4 pt-3">
+      <div className="p-3 sm:p-4 pt-3 sm:pt-3">
         <AddToCartButton course={course} variant="card" />
       </div>
     </div>
